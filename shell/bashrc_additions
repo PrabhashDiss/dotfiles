@@ -71,9 +71,19 @@ if command -v fzf >/dev/null 2>&1; then
         source "/usr/share/fzf/key-bindings.bash"
     fi
     
-    # Source fzf completion
+    # Source fzf completion for **<TAB> trigger
     if [[ -f "/usr/share/bash-completion/completions/fzf" ]]; then
         source "/usr/share/bash-completion/completions/fzf"
+        # Set completion trigger (default is **)
+        export FZF_COMPLETION_TRIGGER='**'
+        
+        # Set up completion for common commands if _fzf_setup_completion exists
+        if declare -F _fzf_setup_completion >/dev/null 2>&1; then
+            _fzf_setup_completion path cd
+            _fzf_setup_completion path ls
+            _fzf_setup_completion path cat
+            _fzf_setup_completion dir cd
+        fi
     fi
     
     # Custom fzf options
