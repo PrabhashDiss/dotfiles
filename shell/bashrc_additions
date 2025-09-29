@@ -37,6 +37,10 @@ if command -v fzf >/dev/null 2>&1; then
     # Edit multiple files with fzf and bat preview
     if command -v bat >/dev/null 2>&1; then
         alias vf='vim $(fzf -m --preview "bat --color=always {}")'
+    elif command -v batcat >/dev/null 2>&1; then
+        alias vf='vim $(fzf -m --preview "batcat --color=always {}")'
+        # Create bat alias for batcat on Ubuntu
+        alias bat='batcat'
     else
         alias vf='vim $(fzf -m --preview "cat {}")'
     fi
@@ -60,7 +64,17 @@ alias ports='netstat -tulanp'
 
 # fzf key bindings and fuzzy completion
 if command -v fzf >/dev/null 2>&1; then
-    eval "$(fzf --bash)"
+    # Source fzf key bindings (compatible with older versions)
+    if [[ -f "/usr/share/doc/fzf/examples/key-bindings.bash" ]]; then
+        source "/usr/share/doc/fzf/examples/key-bindings.bash"
+    elif [[ -f "/usr/share/fzf/key-bindings.bash" ]]; then
+        source "/usr/share/fzf/key-bindings.bash"
+    fi
+    
+    # Source fzf completion
+    if [[ -f "/usr/share/bash-completion/completions/fzf" ]]; then
+        source "/usr/share/bash-completion/completions/fzf"
+    fi
     
     # Custom fzf options
     export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
@@ -70,6 +84,8 @@ if command -v fzf >/dev/null 2>&1; then
     # Use bat for preview if available
     if command -v bat >/dev/null 2>&1; then
         export FZF_CTRL_T_OPTS="--preview 'bat --color=always {}' --preview-window=right:50%:wrap"
+    elif command -v batcat >/dev/null 2>&1; then
+        export FZF_CTRL_T_OPTS="--preview 'batcat --color=always {}' --preview-window=right:50%:wrap"
     fi
 fi
 
