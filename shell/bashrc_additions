@@ -79,10 +79,13 @@ if command -v fzf >/dev/null 2>&1; then
         
         # Set up completion for common commands if _fzf_setup_completion exists
         if declare -F _fzf_setup_completion >/dev/null 2>&1; then
-            _fzf_setup_completion path cd
+            # Override cd completion with fzf directory completion
+            complete -r cd 2>/dev/null || true  # Remove existing cd completion
+            _fzf_setup_completion dir cd        # Set up fzf directory completion for cd
+            
+            # Set up other completions
             _fzf_setup_completion path ls
             _fzf_setup_completion path cat
-            _fzf_setup_completion dir cd
         fi
     fi
     
