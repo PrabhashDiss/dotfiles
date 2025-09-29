@@ -73,23 +73,64 @@ install_fzf() {
     fi
 }
 
-# Set up fzf key bindings and completion
-setup_fzf() {
-    log_info "Setting up fzf key bindings and completion..."
+# Install bat for better file previews
+install_bat() {
+    log_info "Checking bat installation..."
     
-    # Check if fzf bindings are already in bashrc
-    if grep -q "fzf --bash" ~/.bashrc 2>/dev/null; then
-        log_success "fzf key bindings already configured in ~/.bashrc"
+    if command_exists bat; then
+        log_success "bat is already installed"
+        log_info "bat version: $(bat --version | head -n1)"
         return 0
     fi
     
-    # Add fzf bindings to bashrc
-    echo "" >> ~/.bashrc
-    echo "# fzf key bindings and fuzzy completion" >> ~/.bashrc
-    echo 'eval "$(fzf --bash)"' >> ~/.bashrc
+    if package_installed bat; then
+        log_success "bat package is already installed via apt"
+        return 0
+    fi
     
-    log_success "fzf key bindings added to ~/.bashrc"
-    log_info "Run 'source ~/.bashrc' or restart your shell to activate fzf bindings"
+    log_info "Installing bat for enhanced file previews..."
+    sudo apt install -y bat
+    
+    if command_exists bat; then
+        log_success "bat installed successfully"
+        log_info "bat version: $(bat --version | head -n1)"
+    else
+        log_warning "bat installation failed, but continuing..."
+    fi
+}
+
+# Set up shell configuration
+setup_shell_config() {
+    log_info "Setting up shell configuration..."
+    
+    local dotfiles_dir="$(pwd)"
+    local bashrc_additions="$dotfiles_dir/shell/bashrc_additions"
+    
+    # Check if shell config is already sourced in bashrc
+    if grep -q "source.*bashrc_additions" ~/.bashrc 2>/dev/null; then
+        log_success "Shell configuration already sourced in ~/.bashrc"
+        return 0
+    fi
+    
+    if [[ -f "$bashrc_additions" ]]; then
+        # Add source line to bashrc
+        echo "" >> ~/.bashrc
+        echo "# Source dotfiles shell configuration" >> ~/.bashrc
+        echo "if [[ -f \"$bashrc_additions\" ]]; then" >> ~/.bashrc
+        echo "    source \"$bashrc_additions\"" >> ~/.bashrc
+        echo "fi" >> ~/.bashrc
+        
+        log_success "Shell configuration added to ~/.bashrc"
+        log_info "Includes enhanced aliases, fzf integration, and git-aware prompt"
+    else
+        log_warning "Shell configuration file not found at $bashrc_additions"
+    fi
+}
+
+# Set up fzf key bindings and completion (legacy function for compatibility)
+setup_fzf() {
+    log_info "fzf setup is now handled by shell configuration"
+    log_success "fzf key bindings will be available after shell reload"
 }
 
 # Main function
@@ -107,9 +148,12 @@ main() {
     
     # Install and setup fzf
     install_fzf
+    install_bat
+    setup_shell_config
     setup_fzf
     
     log_success "Bootstrap completed successfully!"
+    log_info "Enhanced aliases available: vf (edit with fzf), cdf (cd with fzf), kp (kill process)"
     log_info "Please restart your shell or run 'source ~/.bashrc' to apply changes"
 }
 
