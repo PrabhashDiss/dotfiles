@@ -77,13 +77,8 @@ if command -v fzf >/dev/null 2>&1; then
         # Set completion trigger (default is **)
         export FZF_COMPLETION_TRIGGER='**'
         
-        # Set up completion for common commands if _fzf_setup_completion exists
+        # Set up completion for other commands
         if declare -F _fzf_setup_completion >/dev/null 2>&1; then
-            # Override cd completion with fzf directory completion
-            complete -r cd 2>/dev/null || true  # Remove existing cd completion
-            _fzf_setup_completion dir cd        # Set up fzf directory completion for cd
-            
-            # Set up other completions
             _fzf_setup_completion path ls
             _fzf_setup_completion path cat
         fi
@@ -130,3 +125,51 @@ export EDITOR=nvim
 export VISUAL=nvim
 export BROWSER=firefox
 export PATH="$HOME/.local/bin:$PATH"
+
+# Custom cd completion that handles fzf trigger
+if command -v fzf >/dev/null 2>&1; then
+    _cd_fzf() {
+        local cur prev words cword
+        # Basic completion initialization
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        prev="${COMP_WORDS[COMP_CWORD-1]}"
+        
+        # Check if current word ends with **
+        if [[ "$cur" == *"$FZF_COMPLETION_TRIGGER" ]]; then
+            # Remove the trigger from current word
+            local prefix
+            if [[ "$cur" == "$FZF_COMPLETION_TRIGGER" ]]; then
+                prefix=""
+            else
+                prefix="${cur%$FZF_COMPLETION_TRIGGER}"
+            fi
+            # Use fzf to select directory
+            local selected
+            if declare -F _fzf_compgen_dir >/dev/null 2>&1 && declare -F __fzf_comprun >/dev/null 2>&1; then
+                selected=$(_fzf_compgen_dir "${prefix:-.}" | \
+                    __fzf_comprun dir --prompt="cd> " \
+                    --header="Select directory" 2>/dev/null || echo "")
+                if [[ -n "$selected" ]]; then
+                    COMPREPLY=("$prefix$selected")
+                    return 0
+                fi
+            fi
+            # Fallback: use regular fzf
+            local dirs
+            dirs=$(find "${prefix:-.}" -type d -not -path '*/\.*' 2>/dev/null | head -100)
+            if [[ -n "$dirs" ]]; then
+                selected=$(echo "$dirs" | fzf --prompt="cd> " --header="Select directory" 2>/dev/null || echo "")
+                if [[ -n "$selected" ]]; then
+                    COMPREPLY=("$selected")
+                    return 0
+                fi
+            fi
+        fi
+        
+        # Use basic directory completion for non-** cases
+        COMPREPLY=($(compgen -d -- "$cur"))
+    }
+    
+    # Set up the completion
+    complete -F _cd_fzf -o nospace cd
+fi
