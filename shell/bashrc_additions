@@ -93,15 +93,6 @@ if command -v fzf >/dev/null 2>&1; then
             _cht_query "$@"
         fi
     }
-
-    # Quick language-specific cheat sheets
-    alias chtbash='cht bash'
-    alias chtgit='cht git'
-    alias chtpython='cht python'
-    alias chtjs='cht javascript'
-    alias chtvim='cht vim'
-    alias chttmux='cht tmux'
-    alias chtfzf='cht fzf'
 fi
 
 # System monitoring
