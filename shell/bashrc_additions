@@ -53,8 +53,10 @@ if command -v fzf >/dev/null 2>&1; then
 fi
 
 # cht.sh with fzf integration
-# Provide a `cht` function that prefers the installed `cht.sh` client but
-# falls back to curl if not installed. Integrates with fzf for topic selection.
+# Provides a `cht` function that prefers the installed `cht.sh` client but
+# falls back to curl if not installed. Integrates with fzf for topic selection
+# and allows for searching within the selected cheat sheet.
+
 if command -v fzf >/dev/null 2>&1; then
     # Function to get available cheat sheet topics
     _cht_topics() {
@@ -84,13 +86,14 @@ if command -v fzf >/dev/null 2>&1; then
                 --preview 'bash -c "_cht_query {} | sed -n 1,200p"' \
                 --preview-window=right:70%:wrap)
             if [[ -n "$topic" ]]; then
-                # Trim whitespace and query
+                # Trim whitespace
                 topic="$(printf '%s' "$topic" | sed 's/^\s*//;s/\s*$//')"
-                _cht_query "$topic"
+                # After selecting a topic, pipe the output to another fzf to search within it
+                _cht_query "$topic" | fzf --prompt="Search in '$topic': " --preview-window=hidden
             fi
         else
-            # Arguments provided - pass directly to the query helper
-            _cht_query "$@"
+            # Arguments provided - pass directly to the query helper and then pipe to fzf for searching
+            _cht_query "$@" | fzf --prompt="Search in '$*': " --preview-window=hidden
         fi
     }
 fi
