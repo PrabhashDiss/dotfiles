@@ -53,25 +53,47 @@ if command -v fzf >/dev/null 2>&1; then
 fi
 
 # cht.sh with fzf integration
-if command -v cht.sh >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1; then
+# Provide a `cht` function that prefers the installed `cht.sh` client but
+# falls back to curl if not installed. Integrates with fzf for topic selection.
+if command -v fzf >/dev/null 2>&1; then
     # Function to get available cheat sheet topics
     _cht_topics() {
-        curl -s https://cht.sh/:list | grep -v "^$"
+        # Use the :list endpoint and filter empty lines
+        curl -fsS https://cht.sh/:list 2>/dev/null | sed '/^$/d'
     }
-    
+
+    # Helper to actually query cheat.sh. Use cht.sh if available, else curl.
+    _cht_query() {
+        if command -v cht.sh >/dev/null 2>&1; then
+            cht.sh "$@"
+        else
+            # If user provided a language+topic like "python list comprehension",
+            # cht.sh expects spaces; curl accepts the same path. We'll URL-encode
+            # spaces as + to be safe for simple queries.
+            local q="$(printf '%s' "$*" | sed 's/ /+/g')"
+            curl -fsS "https://cht.sh/${q}" || echo "Error: failed to contact cheat.sh"
+        fi
+    }
+
     # Interactive cheat sheet lookup with fzf
     cht() {
         local topic
         if [[ $# -eq 0 ]]; then
             # No arguments - show topic selector
-            topic=$(_cht_topics | fzf --prompt="Select topic: " --preview="cht.sh {}" --preview-window=right:70%:wrap)
-            [[ -n "$topic" ]] && cht.sh "$topic"
+            topic=$(_cht_topics | fzf --prompt="Select topic: " \
+                --preview 'bash -c "_cht_query {} | sed -n 1,200p"' \
+                --preview-window=right:70%:wrap)
+            if [[ -n "$topic" ]]; then
+                # Trim whitespace and query
+                topic="$(printf '%s' "$topic" | sed 's/^\s*//;s/\s*$//')"
+                _cht_query "$topic"
+            fi
         else
-            # Arguments provided - pass directly to cht.sh
-            cht.sh "$@"
+            # Arguments provided - pass directly to the query helper
+            _cht_query "$@"
         fi
     }
-    
+
     # Quick language-specific cheat sheets
     alias chtbash='cht bash'
     alias chtgit='cht git'
@@ -154,7 +176,7 @@ fi
 export EDITOR=nvim
 export VISUAL=nvim
 export BROWSER=firefox
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 
 # Use official fzf directory completion for cd
 if command -v fzf >/dev/null 2>&1 && declare -F _fzf_dir_completion >/dev/null 2>&1; then
