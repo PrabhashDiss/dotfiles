@@ -2,6 +2,12 @@
 
 # Dotfiles Bootstrap Script
 # Sets up development environment with essential tools and configurations
+#
+# New: interactive component selection
+# - When run interactively the script prompts which components to install.
+# - Provide a comma-separated list from: fzf, bat, chtsh, tmux, neovim, nvchad, shell, tmuxconf, fzfinit
+# - Use 'all' or press Enter to install everything. Example: "fzf,tmux" installs only fzf and tmux.
+# - In non-interactive shells (or CI) the script defaults to installing all components.
 
 set -e  # Exit on any error
 
@@ -309,21 +315,101 @@ main() {
         log_warning "This script is designed for Ubuntu/Debian. Proceed with caution."
     fi
     
-    # Update package list
-    update_package_list
-    
-    # Install essential tools
-    install_fzf
-    install_bat
-    install_chtsh
-    install_tmux
-    install_neovim
-    
+    # Selection: allow user to pick which components to install
+    # Components: fzf,bat,chtsh,tmux,neovim,nvchad,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat chtsh tmux neovim nvchad shell tmuxconf fzfinit)
+
+    # Default selection behavior: if not running in a TTY, assume all
+    local selection=""
+    if [[ ! -t 0 ]]; then
+        log_info "Non-interactive shell detected - defaulting to installing all components"
+        selection="all"
+    else
+        echo
+        echo "Choose components to install (comma-separated). Available: ${all_components[*]}"
+        echo "Use 'all' to install everything, or press Enter to install all. Examples: fzf,tmux or fzf,bat,chtsh"
+        read -r -p "Install components: " selection
+        selection=${selection:-all}
+    fi
+
+    # Normalize selection to lowercase and remove spaces
+    selection=$(echo "$selection" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')
+
+    # Helper to check if a component is selected
+    is_selected() {
+        local name="$1"
+        if [[ "$selection" == "all" ]]; then
+            return 0
+        fi
+        IFS=',' read -ra parts <<< "$selection"
+        for p in "${parts[@]}"; do
+            if [[ "$p" == "$name" ]]; then
+                return 0
+            fi
+        done
+        return 1
+    }
+
+    # Update package list if any package install is requested
+    if is_selected fzf || is_selected bat || is_selected tmux || is_selected neovim; then
+        update_package_list
+    fi
+
+    # Install selected components
+    if is_selected fzf; then
+        install_fzf
+    else
+        log_info "Skipping fzf"
+    fi
+
+    if is_selected bat; then
+        install_bat
+    else
+        log_info "Skipping bat"
+    fi
+
+    if is_selected chtsh; then
+        install_chtsh
+    else
+        log_info "Skipping cht.sh"
+    fi
+
+    if is_selected tmux; then
+        install_tmux
+    else
+        log_info "Skipping tmux install"
+    fi
+
+    if is_selected neovim; then
+        install_neovim
+    else
+        log_info "Skipping Neovim"
+    fi
+
     # Setup configurations
-    setup_shell_config
-    setup_tmux
-    setup_nvchad
-    setup_fzf
+    if is_selected shell; then
+        setup_shell_config
+    else
+        log_info "Skipping shell configuration"
+    fi
+
+    if is_selected tmuxconf; then
+        setup_tmux
+    else
+        log_info "Skipping tmux configuration"
+    fi
+
+    if is_selected nvchad; then
+        setup_nvchad
+    else
+        log_info "Skipping NvChad setup"
+    fi
+
+    if is_selected fzfinit; then
+        setup_fzf
+    else
+        log_info "Skipping fzf key bindings/completion setup"
+    fi
     
     log_success "Bootstrap completed successfully!"
     log_info "Enhanced aliases available: vf (edit with fzf), cdf (cd with fzf), kp (kill process), cht (cheat sheets with fzf)"
