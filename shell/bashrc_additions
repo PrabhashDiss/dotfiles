@@ -52,6 +52,36 @@ if command -v fzf >/dev/null 2>&1; then
     alias kp='kill -9 $(ps aux | fzf | awk "{print \$2}")'
 fi
 
+# cht.sh with fzf integration
+if command -v cht.sh >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1; then
+    # Function to get available cheat sheet topics
+    _cht_topics() {
+        curl -s https://cht.sh/:list | grep -v "^$"
+    }
+    
+    # Interactive cheat sheet lookup with fzf
+    cht() {
+        local topic
+        if [[ $# -eq 0 ]]; then
+            # No arguments - show topic selector
+            topic=$(_cht_topics | fzf --prompt="Select topic: " --preview="cht.sh {}" --preview-window=right:70%:wrap)
+            [[ -n "$topic" ]] && cht.sh "$topic"
+        else
+            # Arguments provided - pass directly to cht.sh
+            cht.sh "$@"
+        fi
+    }
+    
+    # Quick language-specific cheat sheets
+    alias chtbash='cht bash'
+    alias chtgit='cht git'
+    alias chtpython='cht python'
+    alias chtjs='cht javascript'
+    alias chtvim='cht vim'
+    alias chttmux='cht tmux'
+    alias chtfzf='cht fzf'
+fi
+
 # System monitoring
 alias df='df -h'
 alias du='du -h'

@@ -220,6 +220,38 @@ install_bat() {
     fi
 }
 
+# Install cht.sh for command-line cheat sheets
+install_chtsh() {
+    log_info "Checking cht.sh installation..."
+    
+    if command_exists cht.sh; then
+        log_success "cht.sh is already installed"
+        return 0
+    fi
+    
+    log_info "Installing cht.sh..."
+    
+    # Create local bin directory if it doesn't exist
+    mkdir -p "$HOME/.local/bin"
+    
+    # Download cht.sh script
+    if curl -s https://cht.sh/:cht.sh > "$HOME/.local/bin/cht.sh"; then
+        chmod +x "$HOME/.local/bin/cht.sh"
+        
+        # Verify installation
+        if [[ -x "$HOME/.local/bin/cht.sh" ]]; then
+            log_success "cht.sh installed successfully to ~/.local/bin/cht.sh"
+            log_info "cht.sh provides quick access to cheat sheets for commands and programming languages"
+        else
+            log_error "Failed to make cht.sh executable"
+            return 1
+        fi
+    else
+        log_error "Failed to download cht.sh"
+        return 1
+    fi
+}
+
 # Set up shell configuration
 setup_shell_config() {
     log_info "Setting up shell configuration..."
@@ -283,6 +315,7 @@ main() {
     # Install essential tools
     install_fzf
     install_bat
+    install_chtsh
     install_tmux
     install_neovim
     
@@ -293,7 +326,7 @@ main() {
     setup_fzf
     
     log_success "Bootstrap completed successfully!"
-    log_info "Enhanced aliases available: vf (edit with fzf), cdf (cd with fzf), kp (kill process)"
+    log_info "Enhanced aliases available: vf (edit with fzf), cdf (cd with fzf), kp (kill process), cht (cheat sheets with fzf)"
     log_info "Please restart your shell or run 'source ~/.bashrc' to apply changes"
 }
 
