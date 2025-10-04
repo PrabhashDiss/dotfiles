@@ -386,7 +386,7 @@ main() {
     fi
 
     if is_selected nvchad; then
-        setup_nvchad
+        install_nvchad
     else
         log_info "Skipping NvChad setup"
     fi
