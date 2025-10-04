@@ -134,6 +134,38 @@ setup_tmux() {
     fi
 }
 
+# Install neovim
+install_neovim() {
+    log_info "Checking neovim installation..."
+    
+    if command_exists nvim; then
+        log_success "neovim is already installed"
+        log_info "neovim version: $(nvim --version | head -n1)"
+        return 0
+    fi
+    
+    log_info "Installing neovim from GitHub releases..."
+    
+    # Download and install neovim
+    if curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz; then
+        sudo rm -rf /opt/nvim-linux-x86_64
+        sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+        rm nvim-linux-x86_64.tar.gz
+        
+        # Verify installation
+        if command_exists nvim; then
+            log_success "Successfully installed neovim"
+            log_info "Installed neovim version: $(nvim --version | head -n1)"
+        else
+            log_error "Failed to verify neovim installation"
+            return 1
+        fi
+    else
+        log_error "Failed to download neovim"
+        return 1
+    fi
+}
+
 # Install bat for better file previews
 install_bat() {
     log_info "Checking bat installation..."
@@ -258,8 +290,8 @@ main() {
     fi
     
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,tmux,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat tmux shell tmuxconf fzfinit)
+    # Components: fzf,bat,tmux,neovim,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat tmux neovim shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -314,6 +346,12 @@ main() {
         install_tmux
     else
         log_info "Skipping tmux install"
+    fi
+
+    if is_selected neovim; then
+        install_neovim
+    else
+        log_info "Skipping neovim"
     fi
 
     # Setup configurations

@@ -1,6 +1,9 @@
 # Dotfiles - Bash Configuration Additions
 # Source this file from your ~/.bashrc: source ~/Documents/dotfiles/shell/bashrc_additions
 
+# Add neovim to PATH
+export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+
 # Enhanced history settings
 export HISTSIZE=10000
 export HISTFILESIZE=20000
