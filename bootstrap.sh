@@ -245,10 +245,10 @@ install_bat() {
         
         # Verify installation
         if command_exists bat; then
-            log_success "bat installed successfully"
-            log_info "bat version: $(bat --version | head -n1)"
+            log_success "Successfully installed bat"
+            log_info "Installed bat version: $(bat --version | head -n1)"
         else
-            log_error "bat installation failed"
+            log_error "Failed to verify bat installation"
             return 1
         fi
     else
