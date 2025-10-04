@@ -90,10 +90,6 @@ if command -v fzf >/dev/null 2>&1; then
     # Edit multiple files with fzf and bat preview
     if command -v bat >/dev/null 2>&1; then
         alias vf='vim $(fzf -m --preview "bat --color=always {}")'
-    elif command -v batcat >/dev/null 2>&1; then
-        alias vf='vim $(fzf -m --preview "batcat --color=always {}")'
-        # Create bat alias for batcat on Ubuntu
-        alias bat='batcat'
     else
         alias vf='vim $(fzf -m --preview "cat {}")'
     fi
@@ -213,8 +209,6 @@ if command -v fzf >/dev/null 2>&1; then
     # Use bat for preview if available
     if command -v bat >/dev/null 2>&1; then
         export FZF_CTRL_T_OPTS="--preview 'bat --color=always {}' --preview-window=right:50%:wrap"
-    elif command -v batcat >/dev/null 2>&1; then
-        export FZF_CTRL_T_OPTS="--preview 'batcat --color=always {}' --preview-window=right:50%:wrap"
     fi
 fi
 

@@ -33,7 +33,7 @@ A comprehensive dotfiles repository that sets up a complete development environm
 
 ### Package Installation
 - ✅ **fzf** - Fuzzy finder for files and commands
-- ✅ **bat**/**batcat** - Syntax highlighting cat replacement
+- ✅ **bat** - Syntax highlighting cat replacement
 - ✅ **tmux** - Terminal multiplexer
 - ✅ **neovim** - Modern Vim-based editor
 
