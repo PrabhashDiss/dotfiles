@@ -34,13 +34,6 @@ alias pip='pip3'
 
 # fzf enhanced aliases
 if command -v fzf >/dev/null 2>&1; then
-    # Edit multiple files with fzf and bat preview
-    if command -v bat >/dev/null 2>&1; then
-        alias vf='vim $(fzf -m --preview "bat --color=always {}")'
-    else
-        alias vf='vim $(fzf -m --preview "cat {}")'
-    fi
-    
     # Find and cd to directory
     alias cdf='cd $(find . -type d | fzf)'
     
@@ -157,6 +150,9 @@ if command -v fzf >/dev/null 2>&1; then
     if command -v bat >/dev/null 2>&1; then
         export FZF_CTRL_T_OPTS="--preview 'bat --color=always {}' --preview-window=right:50%:wrap"
     fi
+    
+    # Bind Ctrl+F to open files in vim with fzf and bat preview
+    bind -x '"\C-f": "vim $(fzf -m --preview \"bat --color=always {}\")"'
 fi
 
 # Better prompt with git branch info
