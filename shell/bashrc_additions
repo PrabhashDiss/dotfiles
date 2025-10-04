@@ -34,16 +34,16 @@ alias pip='pip3'
 
 # fzf enhanced aliases
 if command -v fzf >/dev/null 2>&1; then
-    # Open any file (including hidden) with fzf from anywhere and create/attach a tmux session
+    # Open any file (including hidden) with fzf from the current directory and create/attach a tmux session
     fzf_tmux_open() {
-        # Search from home directory to include files across the system dotfiles repo and user files
-        # Use fd if available for speed; fallback to find. Include hidden files but ignore .git directory.
+        # Search from the current working directory (PWD). Use fd if available for speed; fallback to find.
+        # Include hidden files but ignore .git directories.
         local finder
         if command -v fd >/dev/null 2>&1; then
             finder="fd --hidden --type f --strip-cwd-prefix --exclude .git"
         else
-            # -path './.git' -prune avoids descending into .git directories
-            finder="find ~ -path '*/.git' -prune -o -type f -print"
+            # Start find at current directory (.) and avoid descending into .git directories
+            finder="find . -path './.git' -prune -o -type f -print"
         fi
 
         # Build preview command using bat
