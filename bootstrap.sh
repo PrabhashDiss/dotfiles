@@ -319,8 +319,8 @@ main() {
     fi
     
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,tmux,neovim,nvchad,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat tmux neovim nvchad shell tmuxconf fzfinit)
+    # Components: fzf,bat,tmux,nvchad,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat tmux nvchad shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
