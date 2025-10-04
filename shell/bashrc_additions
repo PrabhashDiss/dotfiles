@@ -151,8 +151,13 @@ if command -v fzf >/dev/null 2>&1; then
         export FZF_CTRL_T_OPTS="--preview 'bat --color=always {}' --preview-window=right:50%:wrap"
     fi
     
-    # Bind Ctrl+F to open files in vim with fzf and bat preview
-    bind -x '"\C-f": "vim $(fzf -m --preview \"bat --color=always {}\")"'
+    # Function to open files in vim with fzf and bat preview
+    vf_func() {
+        vim $(fzf -m --preview "bat --color=always {}")
+    }
+    
+    # Bind Ctrl+F to the function
+    bind -x '"\C-f": vf_func'
 fi
 
 # Better prompt with git branch info
