@@ -137,38 +137,52 @@ setup_tmux() {
 # Install neovim
 install_neovim() {
     log_info "Checking neovim installation..."
-    
-    if command_exists nvim; then
-        log_success "neovim is already installed"
-        log_info "neovim version: $(nvim --version | head -n1)"
-        return 0
-    fi
-    
+
+    # if command_exists nvim; then
+    #     log_success "neovim is already installed"
+    #     log_info "neovim version: $(nvim --version | head -n1)"
+    #     return 0
+    # fi
+
     log_info "Installing neovim from GitHub releases..."
-    
+
     # Download and install neovim
     if curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz; then
-        sudo rm -rf /opt/nvim-linux-x86_64
+        sudo rm -rf /opt/nvim-linux-x86_64 || true
         sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
-        rm nvim-linux-x86_64.tar.gz
-        
+        rm -f nvim-linux-x86_64.tar.gz
+
         # Verify installation
         if command_exists nvim; then
             log_success "Successfully installed neovim"
             log_info "Installed neovim version: $(nvim --version | head -n1)"
 
-            # Configure Neovim
-            log_info "Setting up Neovim configuration..."
-            mkdir -p ~/.config/nvim
-            NVIM_INIT_FILE=~/.config/nvim/init.lua
+            # Configure Neovim by cloning my kickstart.nvim
+            log_info "Setting up Neovim configuration using kickstart.nvim..."
 
-            # Add relative number setting if not already set
-            if ! grep -q "vim.opt.relativenumber" "$NVIM_INIT_FILE" 2>/dev/null; then
-                echo 'vim.opt.relativenumber = true' >> "$NVIM_INIT_FILE"
-                log_success "Enabled relative line numbers in Neovim config"
-            else
-                log_info "Relative line numbers already enabled"
+            # Determine target config dir
+            local nvim_config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+
+            # Backup existing config if present
+            if [[ -e "$nvim_config_dir" ]]; then
+                local backup_dir="$nvim_config_dir.backup.$(date +%Y%m%d%H%M%S)"
+                mv "$nvim_config_dir" "$backup_dir"
+                log_info "Existing Neovim config moved to $backup_dir"
             fi
+
+            # Clone via SSH
+            local repo_ssh="git@github-personal:PrabhashDiss/kickstart.nvim.git"
+
+            mkdir -p "$(dirname "$nvim_config_dir")"
+
+            if git clone "$repo_ssh" "$nvim_config_dir" 2>/dev/null; then
+                log_success "Cloned kickstart.nvim (SSH) into $nvim_config_dir"
+            else
+                log_warning "SSH clone failed"
+                return 1
+            fi
+
+            log_info "Neovim configuration installed. Launch Neovim and run :Lazy to install plugins or restart nvim to let lazy.nvim install them on first start."
         else
             log_error "Failed to verify neovim installation"
             return 1
