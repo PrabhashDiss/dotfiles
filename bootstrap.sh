@@ -5,7 +5,7 @@
 #
 # New: interactive component selection
 # - When run interactively the script prompts which components to install.
-# - Provide a comma-separated list from: fzf, bat, tmux, nvchad, shell, tmuxconf, fzfinit
+# - Provide a comma-separated list from: fzf, bat, tmux, shell, tmuxconf, fzfinit
 # - Use 'all' or press Enter to install everything. Example: "fzf,tmux" installs only fzf and tmux.
 # - In non-interactive shells (or CI) the script defaults to installing all components.
 
@@ -75,62 +75,6 @@ install_fzf() {
         log_info "fzf version: $(fzf --version)"
     else
         log_error "fzf installation failed"
-        return 1
-    fi
-}
-
-# Install NvChad starter
-install_nvchad() {
-    # Install Neovim first, as it's required for NvChad
-    log_info "Checking Neovim installation..."
-    
-    if command_exists nvim; then
-        log_success "Neovim is already installed"
-        log_info "Neovim version: $(nvim --version | head -n1)"
-    else
-        if package_installed neovim; then
-            log_success "Neovim package is already installed via apt"
-        else
-            log_info "Installing Neovim..."
-            sudo apt install -y neovim
-            if command_exists nvim; then
-                log_success "Neovim installed successfully"
-                log_info "Neovim version: $(nvim --version | head -n1)"
-            else
-                log_error "Neovim installation failed"
-                return 1
-            fi
-        fi
-    fi
-
-    # Install ripgrep first, as it's required by Telescope
-    log_info "Checking ripgrep (rg) installation..."
-    if command_exists rg; then
-        log_success "ripgrep is already installed"
-        log_info "ripgrep version: $(rg --version | head -n1)"
-    else
-        log_info "Installing ripgrep..."
-        sudo apt install -y ripgrep
-        if command_exists rg; then
-            log_success "ripgrep installed successfully"
-        else
-            log_error "ripgrep installation failed"
-            return 1
-        fi
-    fi
-
-    log_info "Installing NvChad starter config to ~/.config/nvim"
-    local nvim_dir="$HOME/.config/nvim"
-
-    if [[ -d "$nvim_dir" ]]; then
-        log_warning "Existing $nvim_dir detected. It will be removed."
-        rm -rf "$nvim_dir"
-    fi
-
-    if git clone https://github.com/NvChad/starter "$nvim_dir"; then
-        log_success "Cloned NvChad starter to $nvim_dir"
-    else
-        log_error "Failed to clone NvChad starter"
         return 1
     fi
 }
@@ -314,8 +258,8 @@ main() {
     fi
     
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,tmux,nvchad,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat tmux nvchad shell tmuxconf fzfinit)
+    # Components: fzf,bat,tmux,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat tmux shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -349,7 +293,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected tmux || is_selected nvchad; then
+    if is_selected fzf || is_selected bat || is_selected tmux; then
         update_package_list
     fi
 
@@ -383,12 +327,6 @@ main() {
         setup_tmux
     else
         log_info "Skipping tmux configuration"
-    fi
-
-    if is_selected nvchad; then
-        install_nvchad
-    else
-        log_info "Skipping NvChad setup"
     fi
 
     if is_selected fzfinit; then
