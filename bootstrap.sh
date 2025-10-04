@@ -112,8 +112,8 @@ install_nvchad() {
     local nvim_dir="$HOME/.config/nvim"
 
     if [[ -d "$nvim_dir" ]]; then
-        log_warning "Existing $nvim_dir detected. It will be backed up to ${nvim_dir}.backup"
-        mv "$nvim_dir" "${nvim_dir}.backup"
+        log_warning "Existing $nvim_dir detected. It will be removed."
+        rm -rf "$nvim_dir"
     fi
 
     if git clone https://github.com/NvChad/starter "$nvim_dir"; then
