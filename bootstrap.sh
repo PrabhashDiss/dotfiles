@@ -106,34 +106,20 @@ install_neovim() {
     fi
 }
 
-# Set up NvChad configuration
-setup_nvchad() {
-    log_info "Setting up NvChad configuration..."
-    
-    local nvim_config_dir="$HOME/.config/nvim"
-    
-    # Check if NvChad is already installed
-    if [[ -d "$nvim_config_dir" ]] && [[ -f "$nvim_config_dir/init.lua" ]]; then
-        if grep -q "NvChad" "$nvim_config_dir/init.lua" 2>/dev/null; then
-            log_success "NvChad is already installed"
-            return 0
-        fi
+# Install NvChad starter
+install_nvchad() {
+    log_info "Installing NvChad starter config to ~/.config/nvim"
+    local nvim_dir="$HOME/.config/nvim"
+
+    if [[ -d "$nvim_dir" ]]; then
+        log_warning "Existing $nvim_dir detected. It will be backed up to ${nvim_dir}.backup"
+        mv "$nvim_dir" "${nvim_dir}.backup"
     fi
-    
-    # Backup existing Neovim configuration if it exists
-    if [[ -d "$nvim_config_dir" ]]; then
-        local backup_dir="$nvim_config_dir.backup.$(date +%Y%m%d_%H%M%S)"
-        mv "$nvim_config_dir" "$backup_dir"
-        log_info "Backed up existing Neovim config to $backup_dir"
-    fi
-    
-    # Clone NvChad
-    log_info "Cloning NvChad configuration..."
-    if git clone https://github.com/NvChad/starter "$nvim_config_dir" --depth 1; then
-        log_success "NvChad configuration cloned successfully"
-        log_info "Run 'nvim' to complete the setup - NvChad will install plugins automatically"
+
+    if git clone https://github.com/NvChad/starter "$nvim_dir"; then
+        log_success "Cloned NvChad starter to $nvim_dir"
     else
-        log_error "Failed to clone NvChad configuration"
+        log_error "Failed to clone NvChad starter"
         return 1
     fi
 }
