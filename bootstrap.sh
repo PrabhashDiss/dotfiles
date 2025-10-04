@@ -5,7 +5,7 @@
 #
 # New: interactive component selection
 # - When run interactively the script prompts which components to install.
-# - Provide a comma-separated list from: fzf, bat, chtsh, tmux, neovim, nvchad, shell, tmuxconf, fzfinit
+# - Provide a comma-separated list from: fzf, bat, tmux, neovim, nvchad, shell, tmuxconf, fzfinit
 # - Use 'all' or press Enter to install everything. Example: "fzf,tmux" installs only fzf and tmux.
 # - In non-interactive shells (or CI) the script defaults to installing all components.
 
@@ -259,38 +259,6 @@ install_bat() {
     fi
 }
 
-# Install cht.sh for command-line cheat sheets
-install_chtsh() {
-    log_info "Checking cht.sh installation..."
-    
-    if command_exists cht.sh; then
-        log_success "cht.sh is already installed"
-        return 0
-    fi
-    
-    log_info "Installing cht.sh..."
-    
-    # Create local bin directory if it doesn't exist
-    mkdir -p "$HOME/.local/bin"
-    
-    # Download cht.sh script
-    if curl -s https://cht.sh/:cht.sh > "$HOME/.local/bin/cht.sh"; then
-        chmod +x "$HOME/.local/bin/cht.sh"
-        
-        # Verify installation
-        if [[ -x "$HOME/.local/bin/cht.sh" ]]; then
-            log_success "cht.sh installed successfully to ~/.local/bin/cht.sh"
-            log_info "cht.sh provides quick access to cheat sheets for commands and programming languages"
-        else
-            log_error "Failed to make cht.sh executable"
-            return 1
-        fi
-    else
-        log_error "Failed to download cht.sh"
-        return 1
-    fi
-}
-
 # Set up shell configuration
 setup_shell_config() {
     log_info "Setting up shell configuration..."
@@ -349,8 +317,8 @@ main() {
     fi
     
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,chtsh,tmux,neovim,nvchad,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat chtsh tmux neovim nvchad shell tmuxconf fzfinit)
+    # Components: fzf,bat,tmux,neovim,nvchad,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat tmux neovim nvchad shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -360,7 +328,7 @@ main() {
     else
         echo
         echo "Choose components to install (comma-separated). Available: ${all_components[*]}"
-        echo "Use 'all' to install everything, or press Enter to install all. Examples: fzf,tmux or fzf,bat,chtsh"
+        echo "Use 'all' to install everything, or press Enter to install all. Examples: fzf,tmux or fzf,bat,tmux"
         read -r -p "Install components: " selection
         selection=${selection:-all}
     fi
@@ -401,12 +369,6 @@ main() {
         log_info "Skipping bat"
     fi
 
-    if is_selected chtsh; then
-        install_chtsh
-    else
-        log_info "Skipping cht.sh"
-    fi
-
     if is_selected tmux; then
         install_tmux
     else
@@ -445,7 +407,7 @@ main() {
     fi
     
     log_success "Bootstrap completed successfully!"
-    log_info "Enhanced aliases available: cdf (cd with fzf), kp (kill process), cht (cheat sheets with fzf)"
+    log_info "Enhanced aliases available: cdf (cd with fzf), kp (kill process)"
     log_info "Please restart your shell or run 'source ~/.bashrc' to apply changes"
 }
 
