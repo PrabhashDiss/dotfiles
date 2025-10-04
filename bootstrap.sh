@@ -372,12 +372,6 @@ main() {
         log_info "Skipping tmux install"
     fi
 
-    if is_selected neovim; then
-        install_neovim
-    else
-        log_info "Skipping Neovim"
-    fi
-
     # Setup configurations
     if is_selected shell; then
         setup_shell_config
