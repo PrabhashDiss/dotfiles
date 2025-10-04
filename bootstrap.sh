@@ -108,6 +108,22 @@ install_neovim() {
 
 # Install NvChad starter
 install_nvchad() {
+    # Install ripgrep first, as it's required by Telescope
+    log_info "Checking ripgrep (rg) installation..."
+    if command_exists rg; then
+        log_success "ripgrep is already installed"
+        log_info "ripgrep version: $(rg --version | head -n1)"
+    else
+        log_info "Installing ripgrep..."
+        sudo apt install -y ripgrep
+        if command_exists rg; then
+            log_success "ripgrep installed successfully"
+        else
+            log_error "ripgrep installation failed"
+            return 1
+        fi
+    fi
+
     log_info "Installing NvChad starter config to ~/.config/nvim"
     local nvim_dir="$HOME/.config/nvim"
 
