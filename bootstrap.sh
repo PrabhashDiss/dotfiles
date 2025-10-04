@@ -349,7 +349,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected tmux || is_selected neovim; then
+    if is_selected fzf || is_selected bat || is_selected tmux || is_selected nvchad; then
         update_package_list
     fi
 
