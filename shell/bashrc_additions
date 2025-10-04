@@ -42,7 +42,8 @@ if command -v fzf >/dev/null 2>&1; then
         finder="find . -path './.git' -prune -o -type f -print"
 
         # Build preview command using bat
-        local preview_cmd="bat --style=numbers --color=always {}"
+        local preview_cmd
+        preview_cmd="bat --style=numbers --color=always {}"
 
         # Launch fzf; when a file is selected, open or create a tmux session named after the file
         local selected
