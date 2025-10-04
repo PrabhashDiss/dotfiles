@@ -156,6 +156,19 @@ install_neovim() {
         if command_exists nvim; then
             log_success "Successfully installed neovim"
             log_info "Installed neovim version: $(nvim --version | head -n1)"
+
+            # Configure Neovim
+            log_info "Setting up Neovim configuration..."
+            mkdir -p ~/.config/nvim
+            NVIM_INIT_FILE=~/.config/nvim/init.lua
+
+            # Add relative number setting if not already set
+            if ! grep -q "vim.opt.relativenumber" "$NVIM_INIT_FILE" 2>/dev/null; then
+                echo 'vim.opt.relativenumber = true' >> "$NVIM_INIT_FILE"
+                log_success "Enabled relative line numbers in Neovim config"
+            else
+                log_info "Relative line numbers already enabled"
+            fi
         else
             log_error "Failed to verify neovim installation"
             return 1
