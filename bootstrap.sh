@@ -201,28 +201,61 @@ install_bat() {
         log_success "bat is already installed"
         log_info "bat version: $(bat --version | head -n1)"
         return 0
-    elif command_exists batcat; then
-        log_success "bat is already installed as batcat"
-        log_info "bat version: $(batcat --version | head -n1)"
-        return 0
     fi
     
-    if package_installed bat; then
-        log_success "bat package is already installed via apt"
-        return 0
+    log_info "Installing bat from GitHub releases..."
+    
+    # Get the latest release tag
+    local tag
+    tag=$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
+    
+    if [[ -z "$tag" ]]; then
+        log_error "Failed to get latest bat release tag"
+        return 1
     fi
     
-    log_info "Installing bat for enhanced file previews..."
-    sudo apt install -y bat
+    local url="https://github.com/sharkdp/bat/releases/download/$tag/bat-$tag-x86_64-unknown-linux-musl.tar.gz"
+    local temp_dir="/tmp/bat_install"
     
-    if command_exists bat; then
-        log_success "bat installed successfully"
-        log_info "bat version: $(bat --version | head -n1)"
-    elif command_exists batcat; then
-        log_success "bat installed successfully as batcat"
-        log_info "bat version: $(batcat --version | head -n1)"
+    # Create temp directory
+    mkdir -p "$temp_dir"
+    cd "$temp_dir"
+    
+    # Download and extract
+    if curl -L "$url" -o bat.tar.gz && tar -xzf bat.tar.gz; then
+        # Find the extracted directory
+        local extracted_dir
+        extracted_dir=$(find . -name "bat-*" -type d | head -n1)
+        
+        if [[ -z "$extracted_dir" ]]; then
+            log_error "Failed to find extracted bat directory"
+            cd /
+            rm -rf "$temp_dir"
+            return 1
+        fi
+        
+        # Install bat binary
+        mkdir -p "$HOME/.local/bin"
+        cp "$extracted_dir/bat" "$HOME/.local/bin/bat"
+        chmod +x "$HOME/.local/bin/bat"
+        
+        # Clean up
+        cd /
+        rm -rf "$temp_dir"
+        
+        # Verify installation
+        if command_exists bat; then
+            log_success "bat installed successfully"
+            log_info "bat version: $(bat --version | head -n1)"
+        else
+            log_error "bat installation failed"
+            return 1
+        fi
     else
-        log_warning "bat installation failed, but continuing..."
+        log_error "Failed to download or extract bat"
+        cd /
+        rm -rf "$temp_dir"
+        return 1
     fi
 }
 
