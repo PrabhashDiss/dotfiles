@@ -153,7 +153,10 @@ if command -v fzf >/dev/null 2>&1; then
     
     # Function to open files in vim with fzf and bat preview
     vf_func() {
-        vim $(fzf -m --preview "bat --color=always {}")
+        local files=$(fzf -m --preview "bat --color=always {}")
+        if [[ -n "$files" ]]; then
+            vim $files
+        fi
     }
     
     # Bind Ctrl+F to the function
