@@ -34,59 +34,6 @@ alias pip='pip3'
 
 # fzf enhanced aliases
 if command -v fzf >/dev/null 2>&1; then
-    # Open any file (including hidden) with fzf from the current directory and create/attach a tmux session
-    fzf_tmux_open() {
-        # Search from the current working directory (PWD) using find.
-        # Include hidden files but ignore .git directories.
-        local finder
-        finder="find . -path './.git' -prune -o -type f -print"
-
-        # Build preview command using bat
-        local preview_cmd
-        preview_cmd="bat --style=numbers --color=always {}"
-
-        # Launch fzf; when a file is selected, open or create a tmux session named after the file
-        local selected
-        selected=$(eval "$finder" | fzf --height=40% --layout=reverse --border --preview "$preview_cmd" --prompt="Files: " --bind "ctrl-f:ignore")
-
-        if [[ -z "$selected" ]]; then
-            return 0
-        fi
-
-        # Normalize selected path: if finder used relative paths, expand
-        if [[ "$selected" != /* ]]; then
-            # If selection came from fd with --strip-cwd-prefix or find printing relative, try to resolve
-            if [[ -d "$PWD" ]]; then
-                selected="$(realpath -- "$selected" 2>/dev/null || printf '%s' "$selected")"
-            fi
-        fi
-
-        # Derive tmux session name from filename (safe characters only)
-        local base session_name
-        base="$(basename "$selected")"
-        session_name="fzf-$(echo "$base" | tr -c '[:alnum:]' '-' | sed 's/-\+/-/g' | sed 's/^-\|-$//g')"
-
-        # Create or attach tmux session and open file in nvim
-        if command -v tmux >/dev/null 2>&1; then
-            # If tmux session exists, attach; otherwise create and run nvim opening the file
-            if tmux has-session -t "$session_name" 2>/dev/null; then
-                tmux switch-client -t "$session_name"
-            else
-                tmux new-session -s "$session_name" "${EDITOR:-nvim} \"$selected\""
-            fi
-        else
-            # Fallback: open file in background nvim instance
-            ${EDITOR:-nvim} "$selected" &
-        fi
-    }
-
-    # Bind Ctrl+F to the fzf_tmux_open function in interactive shells
-    # Use bind -x for a shell command binding (works in bash). We wrap in a check to avoid errors in non-interactive shells.
-    if [[ -n "$PS1" ]]; then
-        # CTRL-F is \C-f
-        bind -x '"\C-f":fzf_tmux_open'
-    fi
-
     # Edit multiple files with fzf and bat preview
     if command -v bat >/dev/null 2>&1; then
         alias vf='vim $(fzf -m --preview "bat --color=always {}")'
