@@ -79,35 +79,30 @@ install_fzf() {
     fi
 }
 
-# Install Neovim
-install_neovim() {
+# Install NvChad starter
+install_nvchad() {
+    # Install Neovim first, as it's required for NvChad
     log_info "Checking Neovim installation..."
     
     if command_exists nvim; then
         log_success "Neovim is already installed"
         log_info "Neovim version: $(nvim --version | head -n1)"
-        return 0
-    fi
-    
-    if package_installed neovim; then
-        log_success "Neovim package is already installed via apt"
-        return 0
-    fi
-    
-    log_info "Installing Neovim..."
-    sudo apt install -y neovim
-    
-    if command_exists nvim; then
-        log_success "Neovim installed successfully"
-        log_info "Neovim version: $(nvim --version | head -n1)"
     else
-        log_error "Neovim installation failed"
-        return 1
+        if package_installed neovim; then
+            log_success "Neovim package is already installed via apt"
+        else
+            log_info "Installing Neovim..."
+            sudo apt install -y neovim
+            if command_exists nvim; then
+                log_success "Neovim installed successfully"
+                log_info "Neovim version: $(nvim --version | head -n1)"
+            else
+                log_error "Neovim installation failed"
+                return 1
+            fi
+        fi
     fi
-}
 
-# Install NvChad starter
-install_nvchad() {
     # Install ripgrep first, as it's required by Telescope
     log_info "Checking ripgrep (rg) installation..."
     if command_exists rg; then
