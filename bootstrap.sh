@@ -445,7 +445,7 @@ main() {
     fi
     
     log_success "Bootstrap completed successfully!"
-    log_info "Enhanced aliases available: vf (edit with fzf), cdf (cd with fzf), kp (kill process), cht (cheat sheets with fzf)"
+    log_info "Enhanced aliases available: cdf (cd with fzf), kp (kill process), cht (cheat sheets with fzf)"
     log_info "Please restart your shell or run 'source ~/.bashrc' to apply changes"
 }
 

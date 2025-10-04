@@ -47,7 +47,6 @@ A comprehensive dotfiles repository that sets up a complete development environm
 
 ### fzf Enhanced Aliases
 ```bash
-vf          # Edit multiple files with fzf and syntax highlighting preview
 cdf         # Navigate to any directory using fzf
 kp          # Kill processes interactively with fzf
 ```
@@ -88,7 +87,7 @@ dotfiles/
 ### Basic Usage
 ```bash
 # Edit files with preview
-vf
+Ctrl+F
 
 # Navigate directories
 cdf

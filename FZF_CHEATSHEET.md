@@ -40,7 +40,6 @@ After running `./bootstrap.sh`, fzf will be installed and configured with key bi
 
 ### File Operations
 ```bash
-vf          # Edit multiple files with preview: vim $(fzf -m --preview 'bat --color=always {}')
 cdf         # Find and cd to directory
 kp          # Kill process with fuzzy selection
 ```
@@ -48,7 +47,7 @@ kp          # Kill process with fuzzy selection
 ### Usage Examples
 ```bash
 # Edit multiple files with syntax highlighting preview
-vf
+Ctrl+F
 
 # Navigate to any directory quickly
 cdf
