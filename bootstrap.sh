@@ -5,7 +5,7 @@
 #
 # New: interactive component selection
 # - When run interactively the script prompts which components to install.
-# - Provide a comma-separated list from: fzf, bat, tmux, neovim, nvchad, shell, tmuxconf, fzfinit
+# - Provide a comma-separated list from: fzf, bat, tmux, nvchad, shell, tmuxconf, fzfinit
 # - Use 'all' or press Enter to install everything. Example: "fzf,tmux" installs only fzf and tmux.
 # - In non-interactive shells (or CI) the script defaults to installing all components.
 
