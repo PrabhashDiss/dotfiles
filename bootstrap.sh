@@ -119,10 +119,10 @@ setup_tmux() {
         if [[ -L "$home_tmux_conf" ]] && [[ "$(readlink "$home_tmux_conf")" == "$tmux_conf" ]]; then
             log_success "tmux configuration already linked"
         else
-            # Backup existing config if it exists
+            # Remove existing config if it exists
             if [[ -f "$home_tmux_conf" ]] && [[ ! -L "$home_tmux_conf" ]]; then
-                mv "$home_tmux_conf" "$home_tmux_conf.backup"
-                log_info "Backed up existing ~/.tmux.conf to ~/.tmux.conf.backup"
+                rm "$home_tmux_conf"
+                log_info "Removed existing ~/.tmux.conf"
             fi
             
             # Create symlink
@@ -262,6 +262,16 @@ install_bat() {
 # Set up shell configuration
 setup_shell_config() {
     log_info "Setting up shell configuration..."
+    
+    # Install bash-completion if not present
+    if ! package_installed bash-completion; then
+        log_info "Installing bash-completion for enhanced shell autocompletion..."
+        update_package_list
+        sudo apt install -y bash-completion
+        log_success "bash-completion installed"
+    else
+        log_success "bash-completion already installed"
+    fi
     
     local dotfiles_dir="$(pwd)"
     local bashrc_additions="$dotfiles_dir/shell/bashrc_additions"
