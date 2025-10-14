@@ -96,6 +96,53 @@ if command -v fzf >/dev/null 2>&1; then
     
     # Bind Ctrl+F to the function
     bind -x '"\C-f": vf_func'
+    
+    # Function to cd to selected git worktree using fzf
+    gwf() {
+        if [[ ! -d .git && ! -f .git ]]; then
+            echo "Not in a git repository root (.git not found)" >&2
+            return 1
+        fi
+        
+        local root=$(pwd)
+        local worktrees=$(git worktree list --porcelain 2>/dev/null | grep '^worktree ' | sed 's/^worktree //')
+        
+        if [[ -z "$worktrees" ]]; then
+            echo "No worktrees found" >&2
+            return 1
+        fi
+        
+        local selected=$(echo "$worktrees" | fzf --height=40% --reverse --border)
+        if [[ -n "$selected" ]]; then
+            cd "$selected"
+        fi
+    }
+    
+    # Function to remove current git worktree if it's a worktree
+    gwr() {
+        if [[ ! -d .git && ! -f .git ]]; then
+            echo "Not in a git repository root (.git not found)" >&2
+            return 1
+        fi
+        
+        local current=$(pwd)
+        local main_worktree=$(git worktree list --porcelain | grep '^worktree ' | head -1 | sed 's/^worktree //')
+        
+        # Check if current is a worktree and not the main one
+        if [[ "$current" != "$main_worktree" ]] && git worktree list --porcelain | grep -q "^worktree $current$"; then
+            # Check for uncommitted changes
+            if ! git diff --quiet || ! git diff --staged --quiet; then
+                echo "There are uncommitted changes. Please commit or stash them before removing the worktree." >&2
+                return 1
+            fi
+            echo "Removing worktree: $current"
+            cd "$main_worktree"
+            git worktree remove "$current"
+        else
+            echo "Not in a removable worktree (or it's the main worktree)" >&2
+            return 1
+        fi
+    }
 fi
 
 # Better prompt with git branch info
