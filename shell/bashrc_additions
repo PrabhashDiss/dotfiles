@@ -151,7 +151,7 @@ parse_git_branch() {
 }
 
 # Colored prompt
-export PS1='\[\033[02;34m\]\w\[\033[01;33m\]$(parse_git_branch)\[\033[00;37m\]\$ '
+export PS1='\[\033[02;34m\]\w\[\033[01;33m\]\040$(parse_git_branch)\040\[\033[00;37m\]\$ '
 
 # Enable programmable completion features
 if ! shopt -oq posix; then
