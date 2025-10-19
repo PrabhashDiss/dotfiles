@@ -4,6 +4,9 @@
 # Add neovim to PATH
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
+# Enable vi-mode for command line editing
+set -o vi
+
 # Enhanced history settings
 export HISTSIZE=10000
 export HISTFILESIZE=20000
