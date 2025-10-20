@@ -111,7 +111,7 @@ cd "$new_path"
 log "Changed directory to $new_path"
 
 # Pop + re-stage the stash
-if git stash list | grep -q "$stash_msg"; then
+if git stash list --format="%s" | grep -q "$stash_msg"; then
   log "Popping stash in new worktree..."
   if git stash pop --index; then
     log "Stash reapplied and staged successfully."
