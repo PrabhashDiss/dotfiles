@@ -56,7 +56,7 @@ groq_get_branch() {
 
   # Extract branch name
   local branch_name
-  branch_name=$(echo "$response" | jq -r '.choices[0].message.parsed.branch // empty')
+  branch_name=$(echo "$response" | jq -r '.choices[0].message.content // empty' | jq -r '.branch // empty')
 
   if [ -z "$branch_name" ]; then
     log "Error: No branch name returned."
