@@ -17,36 +17,35 @@ groq_get_branch() {
   local diff_input
   diff_input=$(cat)
 
-  # Build JSON payload
-  read -r -d '' payload <<JSON || true
-{
-  "model": "$GROQ_MODEL",
-  "messages": [
-    {
-      "role": "system",
-      "content": "You are a git assistant. Given a git diff, generate a concise, kebab-case branch name in the format '<type>/<topic>'. Examples: 'feat/add-login', 'fix/null-pointer', 'chore/update-docs'."
-    },
-    {
-      "role": "user",
-      "content": ${diff_input@Q}
-    }
-  ],
-  "response_format": {
-    "type": "json_schema",
-    "json_schema": {
-      "name": "branch_name",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "branch": { "type": "string" }
-        },
-        "required": ["branch"],
-        "additionalProperties": false
+  # Build JSON payload using jq for proper escaping
+  local payload
+  payload=$(jq -n --arg model "$GROQ_MODEL" --arg diff "$diff_input" '{
+    model: $model,
+    messages: [
+      {
+        role: "system",
+        content: "You are a git assistant. Given a git diff, generate a concise, kebab-case branch name in the format '\''<type>/<topic>'\''. Examples: '\''feat/add-login'\'', '\''fix/null-pointer'\'', '\''chore/update-docs'\''."
+      },
+      {
+        role: "user",
+        content: $diff
+      }
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "branch_name",
+        schema: {
+          type: "object",
+          properties: {
+            branch: { type: "string" }
+          },
+          required: ["branch"],
+          additionalProperties: false
+        }
       }
     }
-  }
-}
-JSON
+  }')
 
   # Call Groq API
   local response
