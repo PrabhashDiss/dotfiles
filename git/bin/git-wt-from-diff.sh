@@ -110,17 +110,12 @@ log "Created new worktree: $new_path (branch: $branch_name)"
 cd "$new_path"
 log "Changed directory to $new_path"
 
-# Pop + re-stage the stash
-if git stash list --format="%s" | grep "$stash_msg"; then
-  log "Popping stash in new worktree..."
-  if git stash pop --index; then
-    log "Stash reapplied and staged successfully."
-  else
-    log "Conflict or failure applying stash. Trying fallback apply..."
-    git stash apply --index || git stash apply || log "Manual merge may be needed."
-  fi
+# Pop + re-stage the top stash
+log "Popping top stash in new worktree..."
+if git stash pop --index; then
+  log "Stash reapplied and staged successfully."
 else
-  log "No stash found with message '$stash_msg'."
+  log "Conflict or failure applying stash. Please resolve manually."
 fi
 
 log "Done. Now on branch '$branch_name' in '$new_path' with your changes staged."
