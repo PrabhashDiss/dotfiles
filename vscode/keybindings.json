@@ -15,11 +15,6 @@
     "when": "editorTextFocus"
   },
   {
-    "key": "ctrl+alt+c",
-    "command": "workbench.action.toggleChat",
-    "when": "editorTextFocus"
-  },
-  {
     "key": "ctrl+w",
     "command": "workbench.action.closeActiveEditor",
     "when": "editorTextFocus"
