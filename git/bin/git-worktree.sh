@@ -94,10 +94,10 @@ gwc() {
     target_path="$repo_root/$path_name"
 
     if ! git show-ref --verify --quiet "refs/heads/$branch_name"; then
-        git branch "$branch_name"
+        git worktree add -b "$branch_name" "$target_path" HEAD
+    else
+        git worktree add "$target_path" "$branch_name"
     fi
-
-    git worktree add "$target_path" "$branch_name"
     echo "Created worktree: $target_path (branch: $branch_name)"
 }
 
