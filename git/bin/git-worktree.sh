@@ -64,3 +64,12 @@ gwr() {
         return 1
     fi
 }
+
+case "${1:-}" in
+    --f)
+        gwf
+        ;;
+    --r)
+        gwr
+        ;;
+esac
