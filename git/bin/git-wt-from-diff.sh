@@ -70,7 +70,7 @@ groq_get_branch() {
 # --- Main script -----------------------------------------------------
 
 # Ensure we are in a git repo
-if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
   log "Not inside a git repository."
   exit 1
 fi
