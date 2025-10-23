@@ -65,6 +65,42 @@ gwr() {
     fi
 }
 
+gwc() {
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        echo "Not inside a git repository" >&2
+        return 1
+    fi
+
+    local repo_root
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+    if [[ -z "$repo_root" ]]; then
+        echo "Unable to determine repository root" >&2
+        return 1
+    fi
+
+    local input
+    read -r -p "Enter worktree name (<1>/<2>): " input
+    if [[ -z "$input" || ! "$input" =~ / ]]; then
+        echo "Invalid name. Expected format: <1>/<2>" >&2
+        return 1
+    fi
+
+    local part1 part2 branch_name path_name target_path
+    part1=${input%%/*}
+    part2=${input#*/}
+    branch_name="$part1/$part2"
+
+    path_name="branches/${part1}-${part2}"
+    target_path="$repo_root/$path_name"
+
+    if ! git show-ref --verify --quiet "refs/heads/$branch_name"; then
+        git branch "$branch_name"
+    fi
+
+    git worktree add "$target_path" "$branch_name"
+    echo "Created worktree: $target_path (branch: $branch_name)"
+}
+
 case "${1:-}" in
     --f)
         gwf
