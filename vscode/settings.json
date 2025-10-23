@@ -1,0 +1,96 @@
+{
+    "containers.containerClient": "com.microsoft.visualstudio.containers.docker",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "jdk.java.onSave.organizeImports": false,
+
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": true,
+        "scminput": false,
+        "shellscript": true
+    },
+    "github.copilot.nextEditSuggestions.enabled": false,
+    "playwright.reuseBrowser": true,
+    "chat.mcp.autostart": "",
+    "[typescript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "terminal.integrated.suggest.enabled": true,
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": true,
+        "windsurf": true,
+        "cursor-global": true,
+        "cursor-workspace": true
+    },
+    "jdk.telemetry.enabled": false,
+    "github.copilot.chat.pullRequestDescriptionGeneration.instructions": [
+
+    ],
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-17",
+            "path": "/usr/lib/jvm/java-17-openjdk-amd64",
+            "default": true
+        }
+    ],
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.referencedLibraries": [
+        "~/.m2/repository/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar"
+    ],
+    "java.jdt.ls.lombokSupport.enabled": true,
+    "vim.smartRelativeLine": true,
+    "search.quickOpen.includeSymbols": true,
+    "files.autoSave": "afterDelay",
+    "files.watcherExclude": {
+        "**/.mvn/**": true,
+        "**/.terraform/**": true,
+        "**/.vscode/**": true,
+        "**/*.log": true,
+        "**/bin/**": true,
+        "**/build/**": true,
+        "**/coverage/**": true,
+        "**/dist/**": true,
+        "**/logs/**": true,
+        "**/node_modules/**": true,
+        "**/out/**": true,
+        "**/target/**": true,
+        "**/tmp/**": true
+    },
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+
+    "workbench.statusBar.visible": false,
+    "workbench.activityBar.location": "bottom",
+    "workbench.startupEditor": "none",
+    "workbench.tips.enabled": false,
+    "workbench.sideBar.location": "right",
+    "workbench.tree.renderIndentGuides": "always",
+    "workbench.editor.showTabs": "single",
+    "workbench.settings.openDefaultKeybindings": true,
+
+    "editor.minimap.enabled": false,
+    "editor.lineNumbers": "relative",
+    "editor.scrollbar.horizontal": "visible",
+    "editor.scrollbar.vertical": "visible",
+
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+
+    "zenMode.showTabs": "single",
+
+    "gitlens.ai.model": "vscode",
+    "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+    "gitlens.plusFeatures.enabled": false,
+    "gitlens.currentLine.enabled": false,
+    "gitlens.currentLine.pullRequests.enabled": false
+}
