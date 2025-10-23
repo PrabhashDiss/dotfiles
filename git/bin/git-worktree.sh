@@ -108,4 +108,7 @@ case "${1:-}" in
     --r)
         gwr
         ;;
+    --c)
+        gwc
+        ;;
 esac
