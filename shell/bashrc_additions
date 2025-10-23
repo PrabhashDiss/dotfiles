@@ -39,7 +39,7 @@ alias pip='pip3'
 if command -v fzf >/dev/null 2>&1; then
     # Find and cd to directory
     alias cdf='cd $(find . -type d | fzf)'
-    
+
     # Kill process with fzf
     alias kp='kill -9 $(ps aux | fzf | awk "{print \$2}")'
 fi
@@ -62,30 +62,30 @@ if command -v fzf >/dev/null 2>&1; then
     elif [[ -f "/usr/share/fzf/key-bindings.bash" ]]; then
         source "/usr/share/fzf/key-bindings.bash"
     fi
-    
+
     # Source fzf completion for **<TAB> trigger
     if [[ -f "/usr/share/bash-completion/completions/fzf" ]]; then
         source "/usr/share/bash-completion/completions/fzf"
         # Set completion trigger (default is **)
         export FZF_COMPLETION_TRIGGER='**'
-        
+
         # Set up completion for other commands
         if declare -F _fzf_setup_completion >/dev/null 2>&1; then
             _fzf_setup_completion path ls
             _fzf_setup_completion path cat
         fi
     fi
-    
+
     # Custom fzf options
     export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
     export FZF_CTRL_T_OPTS="--preview 'cat {}' --preview-window=right:50%:wrap"
     export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
-    
+
     # Use bat for preview if available
     if command -v bat >/dev/null 2>&1; then
         export FZF_CTRL_T_OPTS="--preview 'bat --color=always {}' --preview-window=right:50%:wrap"
     fi
-    
+
     # Function to open files in vim with fzf and bat preview
     vf_func() {
         local files=$(fzf -m --preview "bat --color=always {}")
@@ -93,41 +93,41 @@ if command -v fzf >/dev/null 2>&1; then
             vim $files
         fi
     }
-    
+
     # Bind Ctrl+F to the function
     bind -x '"\C-f": vf_func'
-    
+
     # Function to cd to selected git worktree using fzf
     gwf() {
         if [[ ! -d .git && ! -f .git ]]; then
             echo "Not in a git repository root (.git not found)" >&2
             return 1
         fi
-        
+
         local root=$(pwd)
         local worktrees=$(git worktree list --porcelain 2>/dev/null | grep '^worktree ' | sed 's/^worktree //')
-        
+
         if [[ -z "$worktrees" ]]; then
             echo "No worktrees found" >&2
             return 1
         fi
-        
+
         local selected=$(echo "$worktrees" | fzf --height=40% --reverse --border)
         if [[ -n "$selected" ]]; then
             cd "$selected"
         fi
     }
-    
+
     # Function to remove current git worktree if it's a worktree
     gwr() {
         if [[ ! -d .git && ! -f .git ]]; then
             echo "Not in a git repository root (.git not found)" >&2
             return 1
         fi
-        
+
         local current=$(pwd)
         local main_worktree=$(git worktree list --porcelain | grep '^worktree ' | head -1 | sed 's/^worktree //')
-        
+
         # Check if current is a worktree and not the main one
         if [[ "$current" != "$main_worktree" ]] && git worktree list --porcelain | grep -q "^worktree $current$"; then
             # Check for uncommitted changes
