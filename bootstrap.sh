@@ -299,6 +299,33 @@ install_bat() {
     fi
 }
 
+# Install lsd
+install_lsd() {
+    log_info "Checking lsd installation..."
+
+    if command_exists lsd; then
+        log_success "lsd is already installed"
+        log_info "lsd version: $(lsd --version)"
+        return 0
+    fi
+
+    if package_installed lsd; then
+        log_success "lsd package is already installed via apt"
+        return 0
+    fi
+
+    log_info "Installing lsd..."
+    sudo apt install -y lsd
+
+    if command_exists lsd; then
+        log_success "lsd installed successfully"
+        log_info "lsd version: $(lsd --version)"
+    else
+        log_error "lsd installation failed"
+        return 1
+    fi
+}
+
 # Install starship prompt
 install_starship() {
     log_info "Checking starship installation..."
@@ -409,7 +436,7 @@ main() {
 
     # Selection: allow user to pick which components to install
     # Components: fzf,bat,tmux,neovim,fish,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat starship tmux neovim fish shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd starship tmux neovim fish shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -443,7 +470,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected tmux || is_selected fish; then
+    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected fish; then
         update_package_list
     fi
 
@@ -458,6 +485,12 @@ main() {
         install_bat
     else
         log_info "Skipping bat"
+    fi
+
+    if is_selected lsd; then
+        install_lsd
+    else
+        log_info "Skipping lsd"
     fi
 
     if is_selected starship; then
