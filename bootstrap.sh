@@ -299,6 +299,47 @@ install_bat() {
     fi
 }
 
+# Install starship prompt
+install_starship() {
+    log_info "Checking starship installation..."
+
+    if command_exists starship; then
+        log_success "starship is already installed"
+        log_info "starship version: $(starship --version)"
+        return 0
+    fi
+
+    log_info "Installing starship..."
+    if curl -sS https://starship.rs/install.sh | sh; then
+        if command_exists starship; then
+            log_success "starship installed successfully"
+            log_info "starship version: $(starship --version)"
+
+            # Set up starship in shell configuration
+            local dotfiles_dir="$(pwd)"
+            local bashrc_additions="$dotfiles_dir/shell/bashrc_additions"
+            if [[ -f "$bashrc_additions" ]]; then
+                if ! grep -q 'eval "$(starship init bash)"' "$bashrc_additions"; then
+                    echo "" >> "$bashrc_additions"
+                    echo "# Initialize starship prompt" >> "$bashrc_additions"
+                    echo 'eval "$(starship init bash)"' >> "$bashrc_additions"
+                    log_success "starship init added to shell configuration"
+                else
+                    log_success "starship init already configured"
+                fi
+            else
+                log_warning "bashrc_additions file not found, starship init not added"
+            fi
+        else
+            log_error "starship installation failed"
+            return 1
+        fi
+    else
+        log_error "Failed to download and install starship"
+        return 1
+    fi
+}
+
 # Set up shell configuration
 setup_shell_config() {
     log_info "Setting up shell configuration..."
@@ -368,7 +409,7 @@ main() {
 
     # Selection: allow user to pick which components to install
     # Components: fzf,bat,tmux,neovim,fish,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat tmux neovim fish shell tmuxconf fzfinit)
+    local all_components=(fzf bat starship tmux neovim fish shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -417,6 +458,12 @@ main() {
         install_bat
     else
         log_info "Skipping bat"
+    fi
+
+    if is_selected starship; then
+        install_starship
+    else
+        log_info "Skipping starship"
     fi
 
     if is_selected tmux; then
