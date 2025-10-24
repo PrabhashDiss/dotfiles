@@ -320,6 +320,19 @@ install_lsd() {
     if command_exists lsd; then
         log_success "lsd installed successfully"
         log_info "lsd version: $(lsd --version)"
+
+        # Set up lsd aliases in ~/.bashrc
+        if ! grep -q "alias ls='lsd'" ~/.bashrc 2>/dev/null; then
+            echo "" >> ~/.bashrc
+            echo "# Use lsd instead of ls" >> ~/.bashrc
+            echo "alias ls='lsd'" >> ~/.bashrc
+            echo "alias ll='lsd -alF'" >> ~/.bashrc
+            echo "alias la='lsd -A'" >> ~/.bashrc
+            echo "alias l='lsd -CF'" >> ~/.bashrc
+            log_success "lsd aliases added to ~/.bashrc"
+        else
+            log_success "lsd aliases already configured in ~/.bashrc"
+        fi
     else
         log_error "lsd installation failed"
         return 1
