@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-log() { >&2 echo "[git-pr-from-branch] $*"; }
+log() { >&2 echo "$*"; }
 
 # --- Configuration ---------------------------------------------------
 GROQ_MODEL="moonshotai/kimi-k2-instruct-0905"
