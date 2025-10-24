@@ -102,13 +102,13 @@ gwc() {
 }
 
 case "${1:-}" in
-    --f)
+    -f)
         gwf
         ;;
-    --r)
+    -r)
         gwr
         ;;
-    --c)
+    -c)
         gwc
         ;;
 esac
