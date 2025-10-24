@@ -5,7 +5,7 @@
 #
 # New: interactive component selection
 # - When run interactively the script prompts which components to install.
-# - Provide a comma-separated list from: fzf, bat, tmux, shell, tmuxconf, fzfinit
+# - Provide a comma-separated list from: fzf, bat, tmux, neovim, fish, shell, tmuxconf, fzfinit
 # - Use 'all' or press Enter to install everything. Example: "fzf,tmux" installs only fzf and tmux.
 # - In non-interactive shells (or CI) the script defaults to installing all components.
 
@@ -55,21 +55,21 @@ update_package_list() {
 # Install fzf
 install_fzf() {
     log_info "Checking fzf installation..."
-    
+
     if command_exists fzf; then
         log_success "fzf is already installed"
         log_info "fzf version: $(fzf --version)"
         return 0
     fi
-    
+
     if package_installed fzf; then
         log_success "fzf package is already installed via apt"
         return 0
     fi
-    
+
     log_info "Installing fzf..."
     sudo apt install -y fzf
-    
+
     if command_exists fzf; then
         log_success "fzf installed successfully"
         log_info "fzf version: $(fzf --version)"
@@ -82,21 +82,21 @@ install_fzf() {
 # Install tmux
 install_tmux() {
     log_info "Checking tmux installation..."
-    
+
     if command_exists tmux; then
         log_success "tmux is already installed"
         log_info "tmux version: $(tmux -V)"
         return 0
     fi
-    
+
     if package_installed tmux; then
         log_success "tmux package is already installed via apt"
         return 0
     fi
-    
+
     log_info "Installing tmux..."
     sudo apt install -y tmux
-    
+
     if command_exists tmux; then
         log_success "tmux installed successfully"
         log_info "tmux version: $(tmux -V)"
@@ -109,11 +109,11 @@ install_tmux() {
 # Set up tmux configuration
 setup_tmux() {
     log_info "Setting up tmux configuration..."
-    
+
     local dotfiles_dir="$(pwd)"
     local tmux_conf="$dotfiles_dir/tmux/tmux.conf"
     local home_tmux_conf="$HOME/.tmux.conf"
-    
+
     if [[ -f "$tmux_conf" ]]; then
         # Check if symlink already exists and points to our config
         if [[ -L "$home_tmux_conf" ]] && [[ "$(readlink "$home_tmux_conf")" == "$tmux_conf" ]]; then
@@ -124,7 +124,7 @@ setup_tmux() {
                 rm "$home_tmux_conf"
                 log_info "Removed existing ~/.tmux.conf"
             fi
-            
+
             # Create symlink
             ln -sf "$tmux_conf" "$home_tmux_conf"
             log_success "tmux configuration linked to ~/.tmux.conf"
@@ -193,56 +193,96 @@ install_neovim() {
     fi
 }
 
+# Install fish shell
+install_fish() {
+    log_info "Checking fish installation..."
+
+    if command_exists fish; then
+        log_success "fish is already installed"
+        log_info "fish version: $(fish --version)"
+        return 0
+    fi
+
+    if package_installed fish; then
+        log_success "fish package is already installed via apt"
+        return 0
+    fi
+
+    log_info "Adding fish PPA and installing fish..."
+
+    # Ensure add-apt-repository is available
+    if ! command_exists apt-add-repository; then
+        log_info "Installing software-properties-common so we can add PPAs..."
+        sudo apt update -qq
+        sudo apt install -y software-properties-common
+    fi
+
+    # Use apt-add-repository
+    sudo apt-add-repository -y ppa:fish-shell/release-4
+
+    # Update package list after adding PPA and install fish
+    sudo apt update -qq
+    sudo apt install -y fish
+
+    if command_exists fish; then
+        log_success "fish installed successfully"
+        log_info "fish version: $(fish --version)"
+    else
+        log_error "fish installation failed"
+        return 1
+    fi
+}
+
 # Install bat for better file previews
 install_bat() {
     log_info "Checking bat installation..."
-    
+
     if command_exists bat; then
         log_success "bat is already installed"
         log_info "bat version: $(bat --version | head -n1)"
         return 0
     fi
-    
+
     log_info "Installing bat from GitHub releases..."
-    
+
     # Get the latest release tag
     local tag
     tag=$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
-    
+
     if [[ -z "$tag" ]]; then
         log_error "Failed to get latest bat release tag"
         return 1
     fi
-    
+
     local url="https://github.com/sharkdp/bat/releases/download/$tag/bat-$tag-x86_64-unknown-linux-musl.tar.gz"
     local temp_dir="/tmp/bat_install"
-    
+
     # Create temp directory
     mkdir -p "$temp_dir"
     cd "$temp_dir"
-    
+
     # Download and extract
     if curl -L "$url" -o bat.tar.gz && tar -xzf bat.tar.gz; then
         # Find the extracted directory
         local extracted_dir
         extracted_dir=$(find . -name "bat-*" -type d | head -n1)
-        
+
         if [[ -z "$extracted_dir" ]]; then
             log_error "Failed to find extracted bat directory"
             cd /
             rm -rf "$temp_dir"
             return 1
         fi
-        
+
         # Install bat binary
         mkdir -p "$HOME/.local/bin"
         cp "$extracted_dir/bat" "$HOME/.local/bin/bat"
         chmod +x "$HOME/.local/bin/bat"
-        
+
         # Clean up
         cd /
         rm -rf "$temp_dir"
-        
+
         # Verify installation
         if command_exists bat; then
             log_success "Successfully installed bat"
@@ -262,7 +302,7 @@ install_bat() {
 # Set up shell configuration
 setup_shell_config() {
     log_info "Setting up shell configuration..."
-    
+
     # Install bash-completion if not present
     if ! package_installed bash-completion; then
         log_info "Installing bash-completion for enhanced shell autocompletion..."
@@ -272,16 +312,16 @@ setup_shell_config() {
     else
         log_success "bash-completion already installed"
     fi
-    
+
     local dotfiles_dir="$(pwd)"
     local bashrc_additions="$dotfiles_dir/shell/bashrc_additions"
-    
+
     # Check if shell config is already sourced in bashrc
     if grep -q "source.*bashrc_additions" ~/.bashrc 2>/dev/null; then
         log_success "Shell configuration already sourced in ~/.bashrc"
         return 0
     fi
-    
+
     if [[ -f "$bashrc_additions" ]]; then
         # Add source line to bashrc
         echo "" >> ~/.bashrc
@@ -289,7 +329,7 @@ setup_shell_config() {
         echo "if [[ -f \"$bashrc_additions\" ]]; then" >> ~/.bashrc
         echo "    source \"$bashrc_additions\"" >> ~/.bashrc
         echo "fi" >> ~/.bashrc
-        
+
         log_success "Shell configuration added to ~/.bashrc"
         log_info "Includes enhanced aliases, fzf integration, and git-aware prompt"
     else
@@ -300,14 +340,14 @@ setup_shell_config() {
 # Set up fzf key bindings and completion
 setup_fzf() {
     log_info "fzf key bindings and completion are handled by shell configuration"
-    
+
     # Verify fzf key bindings file exists
     if [[ -f "/usr/share/doc/fzf/examples/key-bindings.bash" ]]; then
         log_success "fzf key bindings found and will be loaded"
     else
         log_warning "fzf key bindings not found at expected location"
     fi
-    
+
     # Verify fzf completion exists
     if [[ -f "/usr/share/bash-completion/completions/fzf" ]]; then
         log_success "fzf bash completion found and will be loaded"
@@ -320,15 +360,15 @@ setup_fzf() {
 main() {
     log_info "Starting dotfiles bootstrap..."
     log_info "Current directory: $(pwd)"
-    
+
     # Check if running on supported OS
     if [[ ! -f /etc/os-release ]] || ! grep -q "ubuntu\|debian" /etc/os-release; then
         log_warning "This script is designed for Ubuntu/Debian. Proceed with caution."
     fi
-    
+
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,tmux,neovim,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat tmux neovim shell tmuxconf fzfinit)
+    # Components: fzf,bat,tmux,neovim,fish,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat tmux neovim fish shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -362,7 +402,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected tmux; then
+    if is_selected fzf || is_selected bat || is_selected tmux || is_selected fish; then
         update_package_list
     fi
 
@@ -391,6 +431,12 @@ main() {
         log_info "Skipping neovim"
     fi
 
+    if is_selected fish; then
+        install_fish
+    else
+        log_info "Skipping fish"
+    fi
+
     # Setup configurations
     if is_selected shell; then
         setup_shell_config
@@ -409,7 +455,7 @@ main() {
     else
         log_info "Skipping fzf key bindings/completion setup"
     fi
-    
+
     log_success "Bootstrap completed successfully!"
     log_info "Enhanced aliases available: cdf (cd with fzf), kp (kill process)"
     log_info "Please restart your shell or run 'source ~/.bashrc' to apply changes"
