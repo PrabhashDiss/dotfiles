@@ -96,6 +96,7 @@ if command -v fzf >/dev/null 2>&1; then
 
     # Bind Ctrl+F to the function
     bind -x '"\C-f": vf_func'
+fi
 
 # Better prompt with git branch info
 parse_git_branch() {
