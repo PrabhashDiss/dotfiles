@@ -134,6 +134,42 @@ setup_tmux() {
     fi
 }
 
+# Install grc
+install_grc() {
+    log_info "Checking grc installation..."
+
+    if command_exists grc; then
+        log_success "grc is already installed"
+        log_info "grc version: $(grc --version 2>/dev/null || echo 'version unknown')"
+    else
+        if package_installed grc; then
+            log_success "grc package is already installed via apt"
+        else
+            log_info "Installing grc..."
+            sudo apt install -y grc
+
+            if command_exists grc; then
+                log_success "grc installed successfully"
+                log_info "grc version: $(grc --version 2>/dev/null || echo 'version unknown')"
+            else
+                log_error "grc installation failed"
+                return 1
+            fi
+        fi
+    fi
+
+    # Configure grc in ~/.bashrc (enable aliases and source system grc if present)
+    if ! grep -q "GRC_ALIASES=true" ~/.bashrc 2>/dev/null; then
+        echo "" >> ~/.bashrc
+        echo "# grc colorizer configuration" >> ~/.bashrc
+        echo "GRC_ALIASES=true" >> ~/.bashrc
+        echo '[[ -s "/etc/profile.d/grc.sh" ]] && source /etc/grc.sh' >> ~/.bashrc
+        log_success "grc configuration added to ~/.bashrc"
+    else
+        log_success "grc configuration already present in ~/.bashrc"
+    fi
+}
+
 # Install neovim
 install_neovim() {
     log_info "Checking neovim installation..."
@@ -448,8 +484,8 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,tmux,neovim,fish,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat lsd starship tmux neovim fish shell tmuxconf fzfinit)
+    # Components: fzf,bat,tmux,grc,neovim,fish,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat lsd starship tmux grc neovim fish shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -483,7 +519,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected fish; then
+    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected fish; then
         update_package_list
     fi
 
@@ -516,6 +552,12 @@ main() {
         install_tmux
     else
         log_info "Skipping tmux install"
+    fi
+
+    if is_selected grc; then
+        install_grc
+    else
+        log_info "Skipping grc"
     fi
 
     if is_selected neovim; then
