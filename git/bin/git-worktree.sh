@@ -75,9 +75,17 @@ gwc() {
         return 1
     fi
 
-    local repo_root
-    repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
-    if [[ -z "$repo_root" ]]; then
+    local repo_root is_bare
+    if repo_root=$(git rev-parse --show-toplevel 2>/dev/null); then
+        :
+    else
+        # If repo_root couldn't be determined, check whether repository is bare
+        if is_bare=$(git rev-parse --is-bare-repository 2>/dev/null); then
+            if [[ "$is_bare" == "true" ]]; then
+                echo "Repository is bare (no work tree). Run this in a non-bare clone." >&2
+                return 1
+            fi
+        fi
         echo "Unable to determine repository root" >&2
         return 1
     fi
