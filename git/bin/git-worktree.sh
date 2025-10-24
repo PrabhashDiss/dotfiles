@@ -37,7 +37,11 @@ gwr() {
     local current
     current=$(pwd -P)
     local toplevel
-    toplevel=$(git rev-parse --show-toplevel 2>/dev/null || true)
+    if toplevel=$(git rev-parse --show-toplevel 2>/dev/null); then
+        :
+    else
+        toplevel=""
+    fi
 
     local worktrees
     worktrees=$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}')
