@@ -523,7 +523,6 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,lsd,tmux,yakuake,grc,neovim,fish,zoxide,shell,tmuxconf,fzfinit
     local all_components=(fzf bat lsd tmux yakuake grc neovim fish zoxide shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
