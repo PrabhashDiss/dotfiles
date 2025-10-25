@@ -269,6 +269,57 @@ install_fish() {
     fi
 }
 
+# Install zoxide (fast directory jumper)
+install_zoxide() {
+    log_info "Checking zoxide installation..."
+
+    if command_exists zoxide; then
+        log_success "zoxide is already installed"
+        log_info "zoxide version: $(zoxide --version 2>/dev/null || echo 'version unknown')"
+        return 0
+    fi
+
+    if package_installed zoxide; then
+        log_success "zoxide package is already installed via apt"
+        return 0
+    fi
+
+    log_info "Installing zoxide via apt..."
+
+    # Make sure package lists are up to date
+    update_package_list || true
+
+    if sudo apt install -y zoxide; then
+        if command_exists zoxide; then
+            log_success "zoxide installed successfully (apt)"
+            log_info "zoxide version: $(zoxide --version 2>/dev/null || echo 'version unknown')"
+
+            # Ensure shell initialization is added to bashrc_additions
+            local dotfiles_dir="$(pwd)"
+            local bashrc_additions="$dotfiles_dir/shell/bashrc_additions"
+            if [[ -f "$bashrc_additions" ]]; then
+                if ! grep -q 'zoxide init bash' "$bashrc_additions"; then
+                    echo "" >> "$bashrc_additions"
+                    echo "# Initialize zoxide for fast directory jumping" >> "$bashrc_additions"
+                    echo 'eval "$(zoxide init bash)"' >> "$bashrc_additions"
+                    echo 'alias cd="z"' >> "$bashrc_additions"
+                    log_success "zoxide init added to shell configuration"
+                else
+                    log_success "zoxide init already configured"
+                fi
+            else
+                log_warning "bashrc_additions file not found, zoxide init not added"
+            fi
+        else
+            log_error "zoxide installation seems to have completed but command is not available"
+            return 1
+        fi
+    else
+        log_error "Failed to install zoxide via apt"
+        return 1
+    fi
+}
+
 # Install bat for better file previews
 install_bat() {
     log_info "Checking bat installation..."
@@ -484,8 +535,8 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    # Components: fzf,bat,tmux,grc,neovim,fish,shell,tmuxconf,fzfinit
-    local all_components=(fzf bat lsd starship tmux grc neovim fish shell tmuxconf fzfinit)
+    # Components: fzf,bat,tmux,grc,neovim,fish,zoxide,shell,tmuxconf,fzfinit
+    local all_components=(fzf bat lsd starship tmux grc neovim fish zoxide shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -519,7 +570,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected fish; then
+    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected fish || is_selected zoxide; then
         update_package_list
     fi
 
@@ -570,6 +621,12 @@ main() {
         install_fish
     else
         log_info "Skipping fish"
+    fi
+
+    if is_selected zoxide; then
+        install_zoxide
+    else
+        log_info "Skipping zoxide"
     fi
 
     # Setup configurations
