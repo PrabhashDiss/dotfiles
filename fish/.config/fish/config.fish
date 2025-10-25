@@ -3,5 +3,5 @@ function fish_greeting
 end
 
 function fish_prompt
-    printf '%s\n\n› ' (pwd)
+    printf '\n%s\n› ' (pwd)
 end
