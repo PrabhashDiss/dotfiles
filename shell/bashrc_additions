@@ -98,13 +98,8 @@ if command -v fzf >/dev/null 2>&1; then
     bind -x '"\C-f": vf_func'
 fi
 
-# Better prompt with git branch info
-parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ \1/'
-}
-
 # Colored prompt
-export PS1='\[\033[02;34m\]\w\[\033[01;33m\]\040$(parse_git_branch)\040\[\033[00;37m\]\$ '
+export PS1='\[\033[02;34m\]\w\040\[\033[00;37m\]\$ '
 
 # Enable programmable completion features
 if ! shopt -oq posix; then
