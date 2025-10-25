@@ -99,7 +99,7 @@ if command -v fzf >/dev/null 2>&1; then
 fi
 
 # Colored prompt
-export PS1='\[\033[01;34m\]\w\040\[\033[00;37m\]\$ '
+export PS1='\n\[\033[01;34m\]\w\n\[\033[00;37m\]\$ '
 
 # Enable programmable completion features
 if ! shopt -oq posix; then
