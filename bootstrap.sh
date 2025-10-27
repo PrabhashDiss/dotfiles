@@ -106,35 +106,6 @@ install_tmux() {
     fi
 }
 
-# Install yakuake
-install_yakuake() {
-    log_info "Checking yakuake installation..."
-
-    if command_exists yakuake; then
-        log_success "yakuake is already installed"
-        log_info "yakuake version: $(yakuake --version 2>/dev/null || echo 'version unknown')"
-        return 0
-    fi
-
-    if package_installed yakuake; then
-        log_success "yakuake package is already installed via apt"
-        return 0
-    fi
-
-    log_info "Installing yakuake..."
-    if sudo apt install -y yakuake; then
-        if command_exists yakuake; then
-            log_success "yakuake installed successfully"
-            log_info "yakuake version: $(yakuake --version 2>/dev/null || echo 'version unknown')"
-        else
-            log_success "yakuake package installed (command not found in PATH)"
-        fi
-    else
-        log_error "yakuake installation failed"
-        return 1
-    fi
-}
-
 # Set up tmux configuration
 setup_tmux() {
     log_info "Setting up tmux configuration..."
@@ -523,7 +494,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd tmux yakuake grc neovim fish zoxide shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd tmux grc neovim fish zoxide shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -557,7 +528,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected fish || is_selected zoxide || is_selected yakuake; then
+    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected fish || is_selected zoxide; then
         update_package_list
     fi
 
@@ -586,11 +557,6 @@ main() {
         log_info "Skipping tmux install"
     fi
 
-    if is_selected yakuake; then
-        install_yakuake
-    else
-        log_info "Skipping yakuake"
-    fi
 
     if is_selected grc; then
         install_grc
