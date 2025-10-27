@@ -31,39 +31,46 @@ gwr() {
         return 1
     fi
 
-    local current
-    current=$(pwd -P)
-    local toplevel
-    if toplevel=$(git rev-parse --show-toplevel 2>/dev/null); then
-        :
-    else
-        toplevel=""
-    fi
-
-    local worktrees
-    worktrees=$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}')
+    local current_path
+    current_path=$(realpath -e .)
 
     local main_worktree
-    if [[ -n "$toplevel" && $(echo "$worktrees" | grep -Fx "$toplevel") ]]; then
-        main_worktree=$toplevel
-    else
-        main_worktree=$(echo "$worktrees" | head -n1)
-    fi
+    main_worktree=$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}' | head -n1 | xargs realpath -e)
 
-    # Check if current is a tracked worktree and not the main one
-    if [[ -n "$(echo "$worktrees" | grep -Fx "$current")" ]] && [[ "$current" != "$main_worktree" ]]; then
-        # Check for uncommitted changes in the worktree
-        if ! git diff --quiet || ! git diff --staged --quiet; then
-            echo "There are uncommitted changes. Please commit or stash them before removing the worktree." >&2
-            return 1
-        fi
-        echo "Removing worktree: $current"
-        cd "$main_worktree" || return
-        git worktree remove "$current"
-    else
-        echo "Not in a removable worktree (or it's the main worktree)" >&2
+    local all_worktrees
+    all_worktrees=$(git worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}' | xargs realpath -e)
+
+    # Find the registered worktree path for this directory
+    local current_worktree
+    current_worktree=$(git worktree list --porcelain 2>/dev/null | awk -v here="$current_path" '
+        /^worktree / { wt=$2 }
+        /^HEAD / && wt != "" {
+            system("realpath -e \"" wt "\" > /tmp/.wtpath");
+            cmd="cat /tmp/.wtpath";
+            cmd | getline resolved;
+            close(cmd);
+            if (resolved == here) print wt;
+            wt=""
+        }' | head -n1)
+
+    if [[ -z "$current_worktree" ]]; then
+        echo "Not in a registered worktree" >&2
         return 1
     fi
+
+    if [[ "$current_worktree" == "$main_worktree" ]]; then
+        echo "Not in a removable worktree (this is the main one)" >&2
+        return 1
+    fi
+
+    if ! git diff --quiet || ! git diff --staged --quiet; then
+        echo "There are uncommitted changes. Commit or stash before removing the worktree." >&2
+        return 1
+    fi
+
+    echo "Removing worktree: $current_worktree"
+    cd "$main_worktree" || return
+    git worktree remove "$current_worktree"
 }
 
 gwc() {
