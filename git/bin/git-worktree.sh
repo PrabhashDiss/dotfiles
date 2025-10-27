@@ -113,20 +113,14 @@ gwc() {
     echo "Created worktree: $target_path (branch: $branch_name)"
 }
 
-menu() {
-    local choice
-    choice=$(printf "%s\n" \
-        "Open worktree" \
-        "Remove current worktree" \
-        "Create worktree" | fzf --height=30% --reverse --border --prompt='Action: ')
-
-    case "$choice" in
-        "Open worktree") gwf ;;
-        "Remove current worktree") gwr ;;
-        "Create worktree") gwc ;;
-        *) echo "No valid selection." >&2; return 1 ;;
-    esac
-}
-
-menu
-exit $?
+case "${1:-}" in
+    -f)
+        gwf
+        ;;
+    -r)
+        gwr
+        ;;
+    -c)
+        gwc
+        ;;
+esac
