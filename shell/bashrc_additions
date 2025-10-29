@@ -120,7 +120,7 @@ export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
 if command -v fzf >/dev/null 2>&1 && declare -F _fzf_dir_completion >/dev/null 2>&1; then
     # Remove any existing cd completion and use fzf's directory completion
     complete -r cd 2>/dev/null || true
-    complete -F _fzf_dir_completion -o default -o bashdefault cd
+    # complete -F _fzf_dir_completion -o default -o bashdefault cd  # Disabled to allow zoxide cd completion
 fi
 
 # Colorize common log levels for easier reading
