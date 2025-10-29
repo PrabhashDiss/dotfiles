@@ -1,2 +1,3 @@
 keybind = ctrl+shift+w=close_surface
 scrollback-limit = 100000
+window-decoration = false
