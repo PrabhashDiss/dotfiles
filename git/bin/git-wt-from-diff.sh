@@ -47,6 +47,10 @@ groq_get_branch() {
     }
   }')
 
+  # Show payload for debugging
+  log "Groq request payload:"
+  log "$payload"
+
   # Call Groq API
   local response
   response=$(curl -s "$GROQ_URL" \
