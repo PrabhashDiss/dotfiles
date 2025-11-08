@@ -5,7 +5,7 @@
 #
 # New: interactive component selection
 # - When run interactively the script prompts which components to install.
-# - Provide a comma-separated list from: fzf, bat, tmux, neovim, fish, shell, tmuxconf, fzfinit
+# - Provide a comma-separated list from: fzf, bat, tmux, neovim, shell, tmuxconf, fzfinit
 # - Use 'all' or press Enter to install everything. Example: "fzf,tmux" installs only fzf and tmux.
 # - In non-interactive shells (or CI) the script defaults to installing all components.
 
@@ -229,45 +229,6 @@ install_neovim() {
     fi
 }
 
-# Install fish shell
-install_fish() {
-    log_info "Checking fish installation..."
-
-    if command_exists fish; then
-        log_success "fish is already installed"
-        log_info "fish version: $(fish --version)"
-        return 0
-    fi
-
-    if package_installed fish; then
-        log_success "fish package is already installed via apt"
-        return 0
-    fi
-
-    log_info "Adding fish PPA and installing fish..."
-
-    # Ensure add-apt-repository is available
-    if ! command_exists apt-add-repository; then
-        log_info "Installing software-properties-common so we can add PPAs..."
-        sudo apt update -qq
-        sudo apt install -y software-properties-common
-    fi
-
-    # Use apt-add-repository
-    sudo apt-add-repository -y ppa:fish-shell/release-4
-
-    # Update package list after adding PPA and install fish
-    sudo apt update -qq
-    sudo apt install -y fish
-
-    if command_exists fish; then
-        log_success "fish installed successfully"
-        log_info "fish version: $(fish --version)"
-    else
-        log_error "fish installation failed"
-        return 1
-    fi
-}
 
 # Install zoxide (fast directory jumper)
 install_zoxide() {
@@ -494,7 +455,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd tmux grc neovim fish zoxide shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd tmux grc neovim zoxide shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -528,7 +489,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected fish || is_selected zoxide; then
+    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected zoxide; then
         update_package_list
     fi
 
@@ -570,11 +531,6 @@ main() {
         log_info "Skipping neovim"
     fi
 
-    if is_selected fish; then
-        install_fish
-    else
-        log_info "Skipping fish"
-    fi
 
     if is_selected zoxide; then
         install_zoxide
