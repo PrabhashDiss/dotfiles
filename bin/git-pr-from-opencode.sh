@@ -6,6 +6,7 @@ source "$SCRIPT_DIR/../lib/editor-helper.sh"
 
 # Parse args
 head_branch=""
+base_branch=""
 while [[ $# -gt 0 ]]; do
   arg="$1"
   case "$arg" in
@@ -15,6 +16,14 @@ while [[ $# -gt 0 ]]; do
         exit 1
       fi
       head_branch="$2"
+      shift 2
+      ;;
+    -b|--base)
+      if [[ $# -lt 2 ]]; then
+        echo "Error: base branch is required"
+        exit 1
+      fi
+      base_branch="$2"
       shift 2
       ;;
     *)
@@ -28,7 +37,11 @@ if [ -z "$head_branch" ]; then
   head_branch=$(git branch --show-current)
 fi
 
-generated_msg=$(opencode run --command generate-pr-msg "$head_branch")
+if [ -z "$base_branch" ]; then
+  base_branch="develop"
+fi
+
+generated_msg=$(opencode run --command generate-pr-msg "$base_branch...$head_branch")
 edited_msg=$(quick_edit "$generated_msg")
 
 # Parse title and body from edited message
@@ -38,5 +51,5 @@ new_body=$(echo "$edited_msg" | awk 'NR>1{print}' | sed '1{/^$/d;}' | sed -e 's/
 gh pr create \
   --title "$new_title" \
   --body "$new_body" \
-  --base "develop" \
+  --base "$base_branch" \
   --head "$head_branch"
