@@ -67,9 +67,105 @@ bluetooth_toggle() {
     fi
 }
 
+bluetooth_menu() {
+    # Ensure bluetooth powered
+    if bluetoothctl show | grep -q "Powered: no"; then
+        bluetoothctl power on >/dev/null 2>&1
+        sleep 1
+    fi
+
+    # Gather devices: "MAC<TAB>Alias..."
+    devices=$(bluetoothctl devices | awk '{ $1=""; mac=$2; $2=""; sub(/^ /,""); alias=$0; print mac "\t" alias }')
+
+    if [ -z "$devices" ]; then
+        notify-send "No devices found"
+        return 0
+    fi
+
+    menu_items=""
+
+    while IFS=$'\t' read -r mac alias; do
+        [[ -z $mac && -z $alias ]] && continue
+
+        info="$(bluetoothctl info "$mac" 2>/dev/null)"
+
+        if printf '%s' "$info" | grep -q 'Paired: yes'; then
+            paired='Paired'
+        else
+            paired='Not paired'
+        fi
+
+        if printf '%s' "$info" | grep -q 'Connected: yes'; then
+            connected='Connected'
+        else
+            connected='Disconnected'
+        fi
+
+        menu_items="${menu_items}${alias}\t${mac}\t[${paired}][${connected}]\n"
+    done <<<"$devices"
+
+    selected=$(printf "%b" "$menu_items" | rofi -dmenu | awk -F$'\t' '{print $2}')
+    [ -z "$selected" ] && return 0
+    mac="$selected"
+
+    # Refresh device info
+    info=$(bluetoothctl info "$mac" 2>/dev/null)
+    paired=$(printf "%s" "$info" | grep -q "Paired: yes" && echo "yes" || echo "no")
+    connected=$(printf "%s" "$info" | grep -q "Connected: yes" && echo "yes" || echo "no")
+
+    # Present actions based on state
+    if [ "$paired" = "yes" ]; then
+        if [ "$connected" = "yes" ]; then
+            action=$(printf "Disconnect\nRemove" | rofi -dmenu)
+        else
+            action=$(printf "Connect\nRemove" | rofi -dmenu)
+        fi
+    else
+        action=$(printf "Pair\nConnect" | rofi -dmenu)
+    fi
+
+    [ -z "$action" ] && return 0
+
+    case "$action" in
+    Pair)
+        bluetoothctl pair "$mac" >/dev/null 2>&1
+        bluetoothctl trust "$mac" >/dev/null 2>&1
+        bluetoothctl connect "$mac" >/dev/null 2>&1
+        notify-send "Pairing initiated: $mac"
+        ;;
+    Connect)
+        if bluetoothctl connect "$mac" >/dev/null 2>&1; then
+            notify-send "Connected $mac"
+        else
+            notify-send "Connect failed: $mac"
+        fi
+        ;;
+    Disconnect)
+        if bluetoothctl disconnect "$mac" >/dev/null 2>&1; then
+            notify-send "Disconnected $mac"
+        else
+            notify-send "Disconnect failed: $mac"
+        fi
+        ;;
+    Remove)
+        if bluetoothctl remove "$mac" >/dev/null 2>&1; then
+            notify-send "Removed $mac"
+        else
+            notify-send "Remove failed: $mac"
+        fi
+        ;;
+    *)
+        notify-send "Unknown action"
+        ;;
+    esac
+}
+
 case "$1" in
     --toggle)
         bluetooth_toggle
+        ;;
+    --menu)
+        bluetooth_menu
         ;;
     *)
         bluetooth_print
