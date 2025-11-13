@@ -185,3 +185,6 @@ bindsym $mod+r mode "resize"
 
 # Start Polybar via launch script
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+
+# Arrange monitors
+exec --no-startup-id sh -c 'EXTERNAL=$(xrandr --query | awk "/ connected/ && /HDMI|DP|VGA/ {print \$1; exit}"); INTERNAL=$(xrandr --query | awk "/ connected/ && /eDP|LVDS/ {print \$1; exit}"); if [ -n "$EXTERNAL" ] && [ -n "$INTERNAL" ]; then xrandr --output "$EXTERNAL" --auto --primary --above "$INTERNAL"; fi'
