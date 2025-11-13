@@ -51,6 +51,11 @@ for ws in "${workspaces[@]}"; do
     out_index=$((i / chunk))
     if [ "$out_index" -ge "$n" ]; then out_index=$((n - 1)); fi
     out="${final_outputs[$out_index]}"
-    i3-msg "workspace number ${ws}; move workspace to output ${out}"
+    # Move workspace and capture i3-msg result
+    if out_json=$(i3-msg "workspace number ${ws}; move workspace to output ${out}" 2>&1); then
+        echo "Assigned workspace ${ws} to output ${out}"
+    else
+        echo "Failed to assign workspace ${ws} to output ${out}: ${out_json}" >&2
+    fi
     i=$((i + 1))
 done
