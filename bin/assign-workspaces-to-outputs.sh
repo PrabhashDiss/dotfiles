@@ -45,6 +45,11 @@ fi
 len=${#workspaces[@]}
 chunk=$(((len + n - 1) / n))
 
+# Record the currently focused workspace so we can return to it later
+orig_ws=""
+orig_ws_json=$(i3-msg -t get_workspaces 2>/dev/null)
+orig_ws=$(printf '%s' "$orig_ws_json" | jq -r '.[] | select(.focused==true) | .num')
+
 # Move each workspace to the appropriate output
 i=0
 for ws in "${workspaces[@]}"; do
@@ -59,3 +64,10 @@ for ws in "${workspaces[@]}"; do
     fi
     i=$((i + 1))
 done
+
+# Return to the original workspace
+if i3-msg "workspace number ${orig_ws}" >/dev/null 2>&1; then
+    echo "Returned to original workspace ${orig_ws}"
+else
+    echo "Failed to return to original workspace ${orig_ws}" >&2
+fi
