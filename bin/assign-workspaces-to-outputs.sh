@@ -29,6 +29,7 @@ for line in "${xr_lines[@]}"; do
         inactive_outputs+=("$out")
     fi
 done
+
 # Final outputs to use
 final_outputs=("${active_outputs[@]}")
 # If no active outputs, fall back to connected-but-inactive outputs
