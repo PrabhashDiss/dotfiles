@@ -5,7 +5,7 @@ STATE_FILE="/tmp/polybar_date_mode_$USER"
 while :; do
     mode=$(cat "$STATE_FILE" | tr -d '\n')
     if [ "$mode" = "1" ]; then
-        printf " %s  %s\n" "$(date +"%Y-%m-%d")" "$(date +"%H:%M")"
+        printf " %s  %s\n" "$(date +"%Y-%m-%d")" "$(date +"%H:%M:%S")"
     else
         printf " %s\n" "$(date +"%H:%M")"
     fi
