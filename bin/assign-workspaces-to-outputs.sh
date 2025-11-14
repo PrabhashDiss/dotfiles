@@ -29,6 +29,7 @@ for line in "${xr_lines[@]}"; do
         inactive_outputs+=("$out")
     fi
 done
+
 # Final outputs to use
 final_outputs=("${active_outputs[@]}")
 # If no active outputs, fall back to connected-but-inactive outputs
@@ -45,12 +46,32 @@ fi
 len=${#workspaces[@]}
 chunk=$(((len + n - 1) / n))
 
+# Record the currently focused workspace so we can return to it later
+orig_ws_json=$(i3-msg -t get_workspaces 2>/dev/null) || { echo "Failed to get workspace list" >&2; exit 1; }
+orig_ws=$(printf '%s' "$orig_ws_json" | jq -r '.[] | select(.focused==true) | .num' 2>/dev/null) || { echo "Failed to parse focused workspace" >&2; exit 1; }
+if [ -z "$orig_ws" ]; then
+    echo "Could not determine focused workspace" >&2
+    exit 1
+fi
+
 # Move each workspace to the appropriate output
 i=0
 for ws in "${workspaces[@]}"; do
     out_index=$((i / chunk))
     if [ "$out_index" -ge "$n" ]; then out_index=$((n - 1)); fi
     out="${final_outputs[$out_index]}"
-    i3-msg "workspace number ${ws}; move workspace to output ${out}"
+    # Move workspace and capture i3-msg result
+    if out_json=$(i3-msg "workspace number ${ws}; move workspace to output ${out}" 2>&1); then
+        echo "Assigned workspace ${ws} to output ${out}"
+    else
+        echo "Failed to assign workspace ${ws} to output ${out}: ${out_json}" >&2
+    fi
     i=$((i + 1))
 done
+
+# Return to the original workspace
+if i3-msg "workspace number ${orig_ws}" >/dev/null 2>&1; then
+    echo "Returned to original workspace ${orig_ws}"
+else
+    echo "Failed to return to original workspace ${orig_ws}" >&2
+fi
