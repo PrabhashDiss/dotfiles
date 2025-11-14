@@ -51,6 +51,9 @@ tiling_drag modifier titlebar
 # start a terminal
 bindsym $mod+Return exec ghostty
 
+# lock screen
+bindsym $mod+Shift+x exec --no-startup-id i3lock -c 000000
+
 # kill focused window
 bindsym $mod+Shift+q kill
 
