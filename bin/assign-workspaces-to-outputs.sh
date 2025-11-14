@@ -47,9 +47,12 @@ len=${#workspaces[@]}
 chunk=$(((len + n - 1) / n))
 
 # Record the currently focused workspace so we can return to it later
-orig_ws=""
-orig_ws_json=$(i3-msg -t get_workspaces 2>/dev/null)
-orig_ws=$(printf '%s' "$orig_ws_json" | jq -r '.[] | select(.focused==true) | .num')
+orig_ws_json=$(i3-msg -t get_workspaces 2>/dev/null) || { echo "Failed to get workspace list" >&2; exit 1; }
+orig_ws=$(printf '%s' "$orig_ws_json" | jq -r '.[] | select(.focused==true) | .num' 2>/dev/null) || { echo "Failed to parse focused workspace" >&2; exit 1; }
+if [ -z "$orig_ws" ]; then
+    echo "Could not determine focused workspace" >&2
+    exit 1
+fi
 
 # Move each workspace to the appropriate output
 i=0
