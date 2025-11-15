@@ -8,7 +8,12 @@ polybar-msg cmd quit
 
 # Launch bar(s)
 # Logs go to /tmp so you can inspect failures
-echo "---" | tee -a /tmp/polybar-topbar.log
-polybar topbar 2>&1 | tee -a /tmp/polybar-topbar.log & disown
+echo "---" | tee -a /tmp/polybar.log
+# Launch a bar on every connected monitor and write per-monitor logs
+for m in $(xrandr --query | grep " connected" | cut -d" " -f1); do
+    MONITOR=$m polybar topbar 2>&1 | tee -a /tmp/polybar-${m}.log &
+done
+
+disown
 
 echo "Bars launched..."
