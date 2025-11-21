@@ -195,6 +195,9 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 # Move current workspace to another output
 bindsym $mod+Shift+m exec --no-startup-id $HOME/bin/move-workspace-to-output.sh
 
+# Move all workspaces to primary output
+bindsym $mod+Shift+p exec --no-startup-id $HOME/bin/move-all-workspaces-to-primary.sh
+
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
