@@ -18,3 +18,6 @@ function fish_user_key_bindings
 end
 
 starship init fish | source
+
+set -gx PATH "$HOME/.tmuxifier/bin" $PATH
+eval (tmuxifier init - fish)

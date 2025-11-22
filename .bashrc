@@ -117,3 +117,6 @@ if ! shopt -oq posix; then
 fi
 
 eval "$(starship init bash)"
+
+export PATH="$HOME/.tmuxifier/bin:$PATH"
+eval "$(tmuxifier init -)"
