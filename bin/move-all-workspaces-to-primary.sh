@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+for cmd in xrandr i3-msg jq; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        echo "Error: Required command '$cmd' not found" >&2
+        exit 1
+    fi
+done
+
 # Get the primary output
-primary_output=$(xrandr --query | awk '/ connected/ && /primary/ {print $1; exit}')
+primary_output=$(xrandr --query | awk '/^[^ ]+ connected primary/ {print $1; exit}')
 
 if [ -z "$primary_output" ]; then
     echo "No primary output detected" >&2
