@@ -22,9 +22,9 @@ write() {
   notification=$(echo \"$multiline\") ;}
 
 sel() {
+  [ -f "$histfile" ] || touch "$histfile"
   selection=$(tac "$histfile" | dmenu -b -l 5 -i -p "Clipboard history:")
   [ -n "$selection" ] && echo "$selection" | sed "s/$placeholder/\n/g" | xclip -i -selection clipboard && notification="Copied to clipboard!" ;}
-
 case "$1" in
   add) highlight && write ;;
   out) output && write ;;
