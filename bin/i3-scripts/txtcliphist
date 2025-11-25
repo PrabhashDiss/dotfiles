@@ -11,7 +11,11 @@ output() {
   clip=$(xclip -i -f -selection clipboard 2>/dev/null) ;}
 
 write() {
-  [ -f "$histfile" ] || notify-send "Creating $histfile"; touch $histfile
+  if [ ! -f "$histfile" ]; then
+    mkdir -p "$(dirname "$histfile")"
+    touch "$histfile"
+    notify-send "Creating $histfile"
+  fi
   [ -z "$clip" ] && exit 0
   multiline=$(echo "$clip" | sed ':a;N;$!ba;s/\n/'"$placeholder"'/g')
   grep -Fxq "$multiline" "$histfile" || echo "$multiline" >> "$histfile"
