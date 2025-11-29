@@ -38,7 +38,7 @@ function zle-keymap-select () {
 }
 zle -N zle-keymap-select
 zle-line-init() {
-  zle -K viins # Initiate `vi insert` keymap (can be removed if `bindkey -V` has been set elsewhere)
+  zle -K viins # Initiate `vi insert` keymap (can be removed if `bindkey -v` has been set elsewhere)
   _set_beam_cursor
 }
 zle -N zle-line-init
