@@ -35,3 +35,6 @@ if command -v starship >/dev/null 2>&1; then
 else
   echo "Starship is not installed. Please install it to see the prompt."
 fi
+
+# Syntax highlighting
+source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
