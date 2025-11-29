@@ -5,7 +5,7 @@ setopt interactive_comments
 
 # vi mode
 bindkey -v
-export KEYTIMEOUT=1
+KEYTIMEOUT=5
 
 # Use lf to switch directories and bind it to ctrl-o
 lfcd () {
@@ -18,14 +18,14 @@ lfcd () {
   fi
 }
 bindkey -s '^o' 'lfcd\n'
-
+ 
 # Edit line in vim with ctrl-e
 autoload edit-command-line; zle -N edit-command-line
 bindkey '^e' edit-command-line
 bindkey -M vicmd '^e' edit-command-line
 bindkey -M vicmd '^[[P' vi-delete-char
 bindkey -M visual '^[[P' vi-delete
-
+ 
 # Change cursor shape for different vi modes
 autoload -Uz add-zsh-hook
 _set_block_cursor() { print -n -- $'\e[1 q' }   # block cursor
