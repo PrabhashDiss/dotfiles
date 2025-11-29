@@ -3,10 +3,16 @@ setopt histignorealldups sharehistory
 # Use emacs keybindings even if our EDITOR is set to vi
 bindkey -e
 
-# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
-HISTSIZE=1000
-SAVEHIST=1000
-HISTFILE=~/.zsh_history
+# History configuration
+HISTSIZE=1000000
+SAVEHIST=1000000
+# Ensure history directory exists and migrate legacy history
+mkdir -p "${HOME}/.cache/zsh"
+if [[ -f "${HOME}/.zsh_history" ]]; then
+  cat "${HOME}/.zsh_history" >> "${HOME}/.cache/zsh/history"
+  mv "${HOME}/.zsh_history" "${HOME}/.zsh_history.bak"
+fi
+HISTFILE="${HOME}/.cache/zsh/history"
 
 # Use modern completion system
 autoload -Uz compinit
