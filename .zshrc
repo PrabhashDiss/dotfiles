@@ -4,6 +4,13 @@ setopt histignorealldups sharehistory
 bindkey -v
 export KEYTIMEOUT=1
 
+# Edit line in vim with ctrl-e
+autoload edit-command-line; zle -N edit-command-line
+bindkey '^e' edit-command-line
+bindkey -M vicmd '^[[P' vi-delete-char
+bindkey -M vicmd '^e' edit-command-line
+bindkey -M visual '^[[P' vi-delete
+
 # History configuration
 HISTSIZE=1000000
 SAVEHIST=1000000
