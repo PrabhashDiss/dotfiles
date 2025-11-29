@@ -322,7 +322,7 @@ install_zoxide() {
 
 # Install zsh
 install_zsh() {
-    log_info "Installing zsh and zsh-syntax-highlighting..."
+    log_info "Installing zsh, lf, and zsh-syntax-highlighting..."
 
     # Verify git is available
     if ! command_exists git; then
@@ -348,6 +348,26 @@ install_zsh() {
     else
         log_success "zsh is already installed"
         log_info "zsh version: $(zsh --version)"
+    fi
+
+    # Install lf file manager
+    if ! command_exists lf; then
+        if package_installed lf; then
+            log_success "lf package is already installed via apt"
+        else
+            log_info "Installing lf..."
+            sudo apt install -y lf
+            if command_exists lf; then
+                log_success "lf installed successfully"
+                log_info "lf version: $(lf -version 2>/dev/null || echo 'version unknown')"
+            else
+                log_error "lf installation failed"
+                return 1
+            fi
+        fi
+    else
+        log_success "lf is already installed"
+        log_info "lf version: $(lf -version 2>/dev/null || echo 'version unknown')"
     fi
 
     # Install zsh-syntax-highlighting
