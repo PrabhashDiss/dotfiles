@@ -1,7 +1,8 @@
 setopt histignorealldups sharehistory
 
-# Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
+# vi mode
+bindkey -v
+export KEYTIMEOUT=1
 
 # History configuration
 HISTSIZE=1000000
