@@ -1,5 +1,6 @@
 setopt histignorealldups sharehistory
 
+setopt autocd
 setopt interactive_comments
 
 # Use emacs keybindings even if our EDITOR is set to vi
