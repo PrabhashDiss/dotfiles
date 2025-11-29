@@ -120,3 +120,38 @@ eval "$(starship init bash)"
 
 export PATH="$HOME/.tmuxifier/bin:$PATH"
 eval "$(tmuxifier init -)"
+
+# Directory to store command outputs
+OUTPUT_DIR="$HOME/.bash_output_cache"
+LAST_OUTPUT_FILE="$OUTPUT_DIR/last_output.txt"
+
+# Function to search through last captured command output
+search_last_output() {
+    if [ -f "$LAST_OUTPUT_FILE" ] && [ -s "$LAST_OUTPUT_FILE" ]; then
+        less -R -i "$LAST_OUTPUT_FILE"
+    else
+        echo "No captured output found. Use 'cap <command>' to capture output."
+        return 1
+    fi
+}
+
+# Function to run a command and capture its output with colors
+cap() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: cap <command>"
+        echo "Example: cap ls --color=always"
+        echo "Then use 'slo' to search through the output"
+        return 1
+    fi
+
+    mkdir -p "$OUTPUT_DIR"
+
+    # Run the command with script to preserve colors
+    script -q -c "bash -ic \"$*\"" -f "$LAST_OUTPUT_FILE" 2>/dev/null
+
+    # Clean up script artifacts
+    sed -i 's/\r$//' "$LAST_OUTPUT_FILE" 2>/dev/null || true
+}
+
+# Alias to search the last captured output
+alias slo=search_last_output
