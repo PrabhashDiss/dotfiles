@@ -26,6 +26,25 @@ bindkey -M vicmd '^e' edit-command-line
 bindkey -M vicmd '^[[P' vi-delete-char
 bindkey -M visual '^[[P' vi-delete
 
+# Change cursor shape for different vi modes
+autoload -Uz add-zsh-hook
+_set_block_cursor() { print -n -- $'\e[1 q' }   # block cursor
+_set_beam_cursor()  { print -n -- $'\e[5 q' }   # beam cursor
+function zle-keymap-select () {
+  case $KEYMAP in
+    vicmd) _set_block_cursor;;
+    viins|main) _set_beam_cursor;;
+  esac
+}
+zle -N zle-keymap-select
+zle-line-init() {
+  zle -K viins # Initiate `vi insert` keymap (can be removed if `bindkey -V` has been set elsewhere)
+  _set_beam_cursor
+}
+zle -N zle-line-init
+_set_beam_cursor # Use beam cursor on startup
+add-zsh-hook precmd _set_beam_cursor # Use beam cursor before each prompt
+
 # History configuration
 HISTSIZE=1000000
 SAVEHIST=1000000
