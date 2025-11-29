@@ -12,6 +12,9 @@ HISTFILE=~/.zsh_history
 autoload -Uz compinit
 compinit
 
+zmodload zsh/complist
+_comp_options+=(globdots)		# Include hidden files
+
 zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _expand _complete _correct _approximate
 zstyle ':completion:*' format 'Completing %d'
