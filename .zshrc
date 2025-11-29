@@ -7,12 +7,12 @@ bindkey -e
 HISTSIZE=1000000
 SAVEHIST=1000000
 # Ensure history directory exists and migrate legacy history
-mkdir -p ~/.cache/zsh
-if [[ -f ~/.zsh_history ]]; then
-  cat ~/.zsh_history >> ~/.cache/zsh/history
-  mv ~/.zsh_history ~/.zsh_history.bak
+mkdir -p "${HOME}/.cache/zsh"
+if [[ -f "${HOME}/.zsh_history" ]]; then
+  cat "${HOME}/.zsh_history" >> "${HOME}/.cache/zsh/history"
+  mv "${HOME}/.zsh_history" "${HOME}/.zsh_history.bak"
 fi
-HISTFILE=~/.cache/zsh/history
+HISTFILE="${HOME}/.cache/zsh/history"
 
 # Use modern completion system
 autoload -Uz compinit
