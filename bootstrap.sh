@@ -320,6 +320,56 @@ install_zoxide() {
     fi
 }
 
+# Install zsh
+install_zsh() {
+    log_info "Installing zsh and zsh-syntax-highlighting..."
+
+    # Verify git is available
+    if ! command_exists git; then
+        log_error "git is required to clone zsh-syntax-highlighting but is not installed"
+        return 1
+    fi
+
+    # Install zsh if not present
+    if ! command_exists zsh; then
+        if package_installed zsh; then
+            log_success "zsh package is already installed via apt"
+        else
+            log_info "Installing zsh..."
+            sudo apt install -y zsh
+            if command_exists zsh; then
+                log_success "zsh installed successfully"
+                log_info "zsh version: $(zsh --version)"
+            else
+                log_error "zsh installation failed"
+                return 1
+            fi
+        fi
+    else
+        log_success "zsh is already installed"
+        log_info "zsh version: $(zsh --version)"
+    fi
+
+    # Install zsh-syntax-highlighting
+    local plugin_dir="$HOME/.zsh/plugins"
+
+    # Create the plugins directory if it doesn't exist
+    mkdir -p "$plugin_dir"
+
+    if [[ -d "$plugin_dir/zsh-syntax-highlighting" ]]; then
+        log_success "zsh-syntax-highlighting already cloned"
+        return 0
+    fi
+
+    # Clone the repository
+    if git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir/zsh-syntax-highlighting"; then
+        log_success "zsh-syntax-highlighting cloned successfully"
+    else
+        log_error "Failed to clone zsh-syntax-highlighting"
+        return 1
+    fi
+}
+
 # Install bat for better file previews
 install_bat() {
     log_info "Checking bat installation..."
@@ -494,7 +544,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd tmux grc neovim fish zoxide shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd tmux grc neovim fish zoxide zsh shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -580,6 +630,12 @@ main() {
         install_zoxide
     else
         log_info "Skipping zoxide"
+    fi
+
+    if is_selected zsh; then
+        install_zsh
+    else
+        log_info "Skipping zsh"
     fi
 
     # Setup configurations
