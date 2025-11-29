@@ -3,8 +3,9 @@ setopt histignorealldups sharehistory
 setopt autocd
 setopt interactive_comments
 
-# Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
+# vi mode
+bindkey -v
+export KEYTIMEOUT=1
 
 # Use lf to switch directories and bind it to ctrl-o
 lfcd () {
