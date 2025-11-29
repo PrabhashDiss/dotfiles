@@ -324,6 +324,12 @@ install_zoxide() {
 install_zsh() {
     log_info "Installing zsh and zsh-syntax-highlighting..."
 
+    # Verify git is available
+    if ! command_exists git; then
+        log_error "git is required to clone zsh-syntax-highlighting but is not installed"
+        return 1
+    fi
+
     # Install zsh if not present
     if ! command_exists zsh; then
         if package_installed zsh; then
