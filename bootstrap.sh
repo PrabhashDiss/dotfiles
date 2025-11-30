@@ -364,6 +364,24 @@ install_zsh() {
     # Clone the repository
     if git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir/zsh-syntax-highlighting"; then
         log_success "zsh-syntax-highlighting cloned successfully"
+
+        # Generate jj zsh completion into shell/zsh
+        log_info "Generating jj zsh completion..."
+        local zsh_comp_dir="$HOME/shell/zsh"
+        mkdir -p "$zsh_comp_dir"
+        if command_exists jj; then
+            if [[ ! -f "$zsh_comp_dir/_jj" ]]; then
+                if COMPLETE=zsh jj > "$zsh_comp_dir/_jj" 2>/dev/null; then
+                    log_success "jj zsh completion written to $zsh_comp_dir/_jj"
+                else
+                    log_warning "Failed to generate jj zsh completion"
+                fi
+            else
+                log_info "jj zsh completion already exists at $zsh_comp_dir/_jj"
+            fi
+        else
+            log_info "jj not found on PATH; skipping jj completion generation"
+        fi
     else
         log_error "Failed to clone zsh-syntax-highlighting"
         return 1
