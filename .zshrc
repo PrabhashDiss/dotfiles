@@ -3,8 +3,9 @@ setopt histignorealldups sharehistory
 setopt autocd
 setopt interactive_comments
 
-# Use emacs keybindings even if our EDITOR is set to vi
-bindkey -e
+# vi mode
+bindkey -v
+KEYTIMEOUT=20
 
 # Use lf to switch directories and bind it to ctrl-o
 lfcd () {
@@ -17,6 +18,36 @@ lfcd () {
   fi
 }
 bindkey -s '^o' 'lfcd\n'
+ 
+# Edit line in vim with ctrl-e
+autoload -Uz edit-command-line; zle -N edit-command-line
+bindkey '^e' edit-command-line
+bindkey -M vicmd '^e' edit-command-line
+if [[ -n ${terminfo[kdch1]} ]]; then
+  bindkey -M vicmd  "$terminfo[kdch1]"  vi-delete-char
+  bindkey -M visual "$terminfo[kdch1]"  vi-delete
+else
+  echo "Warning: 'kdch1' not found in terminfo. 'Delete' key binding for vi mode not set."
+fi
+
+# Change cursor shape for different vi modes
+autoload -Uz add-zsh-hook
+_set_block_cursor() { print -n -- $'\e[1 q' }   # block cursor
+_set_beam_cursor()  { print -n -- $'\e[5 q' }   # beam cursor
+function zle-keymap-select () {
+  case $KEYMAP in
+    vicmd) _set_block_cursor;;
+    viins|main) _set_beam_cursor;;
+  esac
+}
+zle -N zle-keymap-select
+zle-line-init() {
+  zle -K viins # Initiate `vi insert` keymap (can be removed if `bindkey -v` has been set elsewhere)
+  _set_beam_cursor
+}
+zle -N zle-line-init
+_set_beam_cursor # Use beam cursor on startup
+add-zsh-hook precmd _set_beam_cursor # Use beam cursor before each prompt
 
 # History configuration
 HISTSIZE=1000000
