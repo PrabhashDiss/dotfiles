@@ -23,9 +23,13 @@ bindkey -s '^o' 'lfcd\n'
 autoload -Uz edit-command-line; zle -N edit-command-line
 bindkey '^e' edit-command-line
 bindkey -M vicmd '^e' edit-command-line
-bindkey -M vicmd '^[[P' vi-delete-char
-bindkey -M visual '^[[P' vi-delete
- 
+if [[ -n ${terminfo[kdch1]} ]]; then
+  bindkey -M vicmd  "$terminfo[kdch1]"  vi-delete-char
+  bindkey -M visual "$terminfo[kdch1]"  vi-delete
+else
+  echo "Warning: 'kdch1' not found in terminfo. 'Delete' key binding for vi mode not set."
+fi
+
 # Change cursor shape for different vi modes
 autoload -Uz add-zsh-hook
 _set_block_cursor() { print -n -- $'\e[1 q' }   # block cursor
