@@ -60,6 +60,13 @@ if [[ -f "${HOME}/.zsh_history" ]]; then
 fi
 HISTFILE="${HOME}/.cache/zsh/history"
 
+# Add custom completions directory to `fpath` so generated completions are found
+_zsh_comp_dir="${HOME}/shell/zsh"
+mkdir -p "${_zsh_comp_dir}"
+if (( ${fpath[(Ie)$_zsh_comp_dir]} == 0 )); then
+  fpath=("${_zsh_comp_dir}" $fpath)
+fi
+
 # Use modern completion system
 autoload -Uz compinit
 compinit
