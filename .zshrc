@@ -91,6 +91,85 @@ else
   echo "Starship is not installed. Please install it to see the prompt."
 fi
 
+# Extract archives into a directory named after the file
+ex() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: ex <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|exe|tar.bz2|tar.gz|tar.xz>"
+    echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [...]"
+    return 1
+  fi
+
+  for n in "$@"; do
+    if [ -f "$n" ]; then
+      # Derive directory name
+      base="$(basename "$n")"
+      case "$base" in
+        *.tar.gz|*.tar.bz2|*.tar.xz)
+          dir_name="${base%.*.*}"
+          ;;
+        *)
+          dir_name="${base%.*}"
+          ;;
+      esac
+
+      [ -d "$dir_name" ] || mkdir -p "$dir_name"
+
+      # Use absolute path for some commands that read from stdin
+      path="$(realpath "$n" 2>/dev/null || printf '%s' "$n")"
+
+      case "$n" in
+        *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
+          tar xvf "$n" -C "$dir_name"
+          ;;
+        *.lzma)
+          unlzma -c "$n" > "$dir_name/$(basename "$n" .lzma)"
+          ;;
+        *.bz2)
+          bunzip2 -c "$n" > "$dir_name/$(basename "$n" .bz2)"
+          ;;
+        *.cbr|*.rar)
+          unrar x -ad "$n" "$dir_name/"
+          ;;
+        *.gz)
+          gunzip -c "$n" > "$dir_name/$(basename "$n" .gz)"
+          ;;
+        *.cbz|*.epub|*.zip)
+          unzip -d "$dir_name" "$n"
+          ;;
+        *.z)
+          uncompress -c "$n" > "$dir_name/$(basename "$n" .z)"
+          ;;
+        *.7z|*.arj|*.cab|*.cb7|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar)
+          7z x "$n" -o"$dir_name"
+          ;;
+        *.xz)
+          unxz -c "$n" > "$dir_name/$(basename "$n" .xz)"
+          ;;
+        *.exe)
+          cabextract -d "$dir_name" "$n"
+          ;;
+        *.cpio)
+          # Use realpath so cpio can read the file when changing directory
+          (cd "$dir_name" && cpio -id < "$path")
+          ;;
+        *.cba|*.ace)
+          unace x -y -o"$dir_name" "$n"
+          ;;
+        *)
+          echo "ex: '$n' - unknown archive method"
+          return 1
+          ;;
+      esac
+
+      echo "Extracted '$n' to '$dir_name/'"
+    else
+      echo "'$n' - file does not exist"
+      return 1
+    fi
+  done
+}
+extract() { ex "$@"; }
+
 # Syntax highlighting
 if [[ -f ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
