@@ -102,6 +102,11 @@ bindsym $mod+d exec --no-startup-id dmenu_run
 # .desktop file. It is a wrapper around dmenu, so you need that installed.
 # bindcode $mod+40 exec --no-startup-id i3-dmenu-desktop
 
+# Copy primary selection to clipboard and add to history
+bindsym $mod+c exec --no-startup-id $HOME/.dotfiles/bin/i3-scripts/txtcliphist add
+# Select from history and copy to clipboard
+bindsym $mod+Shift+v exec --no-startup-id $HOME/.dotfiles/bin/i3-scripts/txtcliphist sel
+
 # show dunst notification history
 bindsym $mod+n exec --no-startup-id dunstctl history-pop
 
