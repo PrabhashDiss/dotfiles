@@ -128,7 +128,7 @@ ex() {
           bunzip2 -c "$n" > "$dir_name/$(basename "$n" .bz2)"
           ;;
         *.cbr|*.rar)
-          unrar x -ad "$n" "$dir_name/"
+          unrar x "$n" "$dir_name/"
           ;;
         *.gz)
           gunzip -c "$n" > "$dir_name/$(basename "$n" .gz)"
