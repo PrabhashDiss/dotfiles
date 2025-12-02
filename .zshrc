@@ -5,7 +5,7 @@ setopt interactive_comments
 
 # vi mode
 bindkey -v
-KEYTIMEOUT=5
+KEYTIMEOUT=20
 
 # Use lf to switch directories and bind it to ctrl-o
 lfcd () {
