@@ -94,8 +94,8 @@ fi
 # Extract archives into a directory named after the file
 ex() {
   if [ $# -eq 0 ]; then
-    echo "Usage: ex <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|exe|tar.bz2|tar.gz|tar.xz>"
-    echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [...]"
+    echo "Usage: ex|extract <archive> [archive2] [...]"
+    echo "  Supported: .zip .rar .tar .tar.gz .tar.bz2 .tar.xz .7z .gz .bz2 .xz and more"
     return 1
   fi
 
