@@ -115,7 +115,14 @@ ex() {
       [ -d "$dir_name" ] || mkdir -p "$dir_name"
 
       # Use absolute path for some commands that read from stdin
-      path="$(realpath "$n" 2>/dev/null || printf '%s' "$n")"
+      if ! path="$(realpath "$n" 2>/dev/null)"; then
+        # Fallback if realpath is not available
+        if [[ "$n" = /* ]]; then
+          path="$n"
+        else
+          path="$PWD/$n"
+        fi
+      fi
 
       extraction_status=1
       case "$n" in
@@ -180,8 +187,6 @@ ex() {
         echo "Failed to extract '$n'"
         return 1
       fi
-
-      echo "Extracted '$n' to '$dir_name/'"
     else
       echo "'$n' - file does not exist"
       return 1
