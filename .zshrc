@@ -98,6 +98,116 @@ else
   echo "Starship is not installed. Please install it to see the prompt."
 fi
 
+# Extract archives into a directory named after the file
+ex() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: ex|extract <archive> [archive2] [...]"
+    echo "  Supported: .zip .rar .tar .tar.gz .tar.bz2 .tar.xz .7z .gz .bz2 .xz and more"
+    return 1
+  fi
+
+  failed=0
+  for n in "$@"; do
+    if [ -f "$n" ]; then
+      # Derive directory name
+      base="$(basename "$n")"
+      case "$base" in
+        *.tar.gz|*.tar.bz2|*.tar.xz)
+          dir_name="${base%.*.*}"
+          ;;
+        *)
+          dir_name="${base%.*}"
+          ;;
+      esac
+
+      [ -d "$dir_name" ] || mkdir -p "$dir_name"
+
+      # Use absolute path for some commands that read from stdin
+      if ! path="$(realpath "$n" 2>/dev/null)"; then
+        # Fallback if realpath is not available
+        if [[ "$n" = /* ]]; then
+          path="$n"
+        else
+          path="$PWD/$n"
+        fi
+      fi
+
+      extraction_status=1
+      case "$n" in
+        *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
+          tar xvf "$n" -C "$dir_name"
+          extraction_status=$?
+          ;;
+        *.lzma)
+          unlzma -c "$n" > "$dir_name/$(basename "$n" .lzma)"
+          extraction_status=$?
+          ;;
+        *.bz2)
+          bunzip2 -c "$n" > "$dir_name/$(basename "$n" .bz2)"
+          extraction_status=$?
+          ;;
+        *.cbr|*.rar)
+          unrar x "$n" "$dir_name/"
+          extraction_status=$?
+          ;;
+        *.gz)
+          gunzip -c "$n" > "$dir_name/$(basename "$n" .gz)"
+          extraction_status=$?
+          ;;
+        *.cbz|*.epub|*.zip)
+          unzip -d "$dir_name" "$n"
+          extraction_status=$?
+          ;;
+        *.z)
+          uncompress -c "$n" > "$dir_name/$(basename "$n" .z)"
+          extraction_status=$?
+          ;;
+        *.7z|*.arj|*.cab|*.cb7|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar)
+          7z x "$n" -o"$dir_name"
+          extraction_status=$?
+          ;;
+        *.xz)
+          unxz -c "$n" > "$dir_name/$(basename "$n" .xz)"
+          extraction_status=$?
+          ;;
+        *.exe)
+          cabextract -d "$dir_name" "$n"
+          extraction_status=$?
+          ;;
+        *.cpio)
+          # Use realpath so cpio can read the file when changing directory
+          (cd "$dir_name" && cpio -id < "$path")
+          extraction_status=$?
+          ;;
+        *.cba|*.ace)
+          unace x -y -o"$dir_name" "$n"
+          extraction_status=$?
+          ;;
+        *)
+          echo "ex: '$n' - unknown archive method"
+          failed=1
+          continue
+          ;;
+      esac
+
+      if [ "$extraction_status" -eq 0 ]; then
+        echo "Extracted '$n' to '$dir_name/'"
+      else
+        echo "Failed to extract '$n'"
+        failed=1
+        continue
+      fi
+    else
+      echo "'$n' - file does not exist"
+      failed=1
+      continue
+    fi
+  done
+
+  return $failed
+}
+extract() { ex "$@"; }
+
 # Syntax highlighting
 if [[ -f ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
