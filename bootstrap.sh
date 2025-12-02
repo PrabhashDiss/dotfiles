@@ -356,20 +356,16 @@ install_zsh() {
     # Create the plugins directory if it doesn't exist
     mkdir -p "$plugin_dir"
 
+    # Clone the repository if missing, otherwise report present
     if [[ -d "$plugin_dir/zsh-syntax-highlighting" ]]; then
         log_info "zsh-syntax-highlighting already present"
-    fi
-
-    # Clone the repository
-    if [[ ! -d "$plugin_dir/zsh-syntax-highlighting" ]]; then
+    else
         if git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$plugin_dir/zsh-syntax-highlighting"; then
             log_success "zsh-syntax-highlighting cloned successfully"
         else
             log_error "Failed to clone zsh-syntax-highlighting"
             return 1
         fi
-    else
-        log_success "zsh-syntax-highlighting already cloned"
     fi
 
     # Generate jj zsh completion into shell/zsh
