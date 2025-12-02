@@ -5,13 +5,13 @@ bindkey -e
 
 # Use lf to switch directories and bind it to ctrl-o
 lfcd () {
-    tmp="$(mktemp -uq)"
-    trap 'rm -f $tmp >/dev/null 2>&1 && trap - HUP INT QUIT TERM PWR EXIT' HUP INT QUIT TERM PWR EXIT
-    lf -last-dir-path="$tmp" "$@"
-    if [ -f "$tmp" ]; then
-        dir="$(cat "$tmp")"
-        [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
-    fi
+  tmp="$(mktemp)" || return 1
+  lf -last-dir-path="$tmp" "$@"
+  if [ -f "$tmp" ]; then
+    dir="$(< "$tmp")"
+    [ -d "$dir" ] && [ "$dir" != "$PWD" ] && cd "$dir"
+    rm -f "$tmp"
+  fi
 }
 bindkey -s '^o' 'lfcd\n'
 
