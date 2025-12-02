@@ -99,6 +99,7 @@ ex() {
     return 1
   fi
 
+  failed=0
   for n in "$@"; do
     if [ -f "$n" ]; then
       # Derive directory name
@@ -177,7 +178,8 @@ ex() {
           ;;
         *)
           echo "ex: '$n' - unknown archive method"
-          return 1
+          failed=1
+          continue
           ;;
       esac
 
@@ -185,13 +187,17 @@ ex() {
         echo "Extracted '$n' to '$dir_name/'"
       else
         echo "Failed to extract '$n'"
-        return 1
+        failed=1
+        continue
       fi
     else
       echo "'$n' - file does not exist"
-      return 1
+      failed=1
+      continue
     fi
   done
+
+  return $failed
 }
 extract() { ex "$@"; }
 
