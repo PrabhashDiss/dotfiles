@@ -20,7 +20,7 @@ end
 function ex
     if test (count $argv) -eq 0
         echo "Usage: ex <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
-        echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
+        echo "       ex <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
         return 1
     end
 
