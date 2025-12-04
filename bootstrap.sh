@@ -370,11 +370,23 @@ install_zsh() {
         log_info "lf version: $(lf -version 2>/dev/null || echo 'version unknown')"
     fi
 
-    # Install zsh-syntax-highlighting
+    # Install zsh-autosuggestions and zsh-syntax-highlighting
     local plugin_dir="$HOME/.zsh/plugins"
 
     # Create the plugins directory if it doesn't exist
     mkdir -p "$plugin_dir"
+
+    # Install zsh-autosuggestions
+    if [[ -d "$plugin_dir/zsh-autosuggestions" ]]; then
+        log_info "zsh-autosuggestions already present"
+    else
+        if git clone https://github.com/zsh-users/zsh-autosuggestions.git "$plugin_dir/zsh-autosuggestions"; then
+            log_success "zsh-autosuggestions cloned successfully"
+        else
+            log_error "Failed to clone zsh-autosuggestions"
+            return 1
+        fi
+    fi
 
     # Clone the repository if missing, otherwise report present
     if [[ -d "$plugin_dir/zsh-syntax-highlighting" ]]; then
