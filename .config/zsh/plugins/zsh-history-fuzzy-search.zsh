@@ -9,8 +9,7 @@ zsh-history-fuzzy-search() {
     --height=40% \
     --layout=reverse \
     --border \
-    --no-sort \
-    +s +m -e \
+    +s +m \
     --tiebreak=index \
     --with-nth=2.. \
     -q "$LBUFFER")
