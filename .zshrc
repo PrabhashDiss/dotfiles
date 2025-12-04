@@ -208,6 +208,11 @@ ex() {
 }
 extract() { ex "$@"; }
 
+# History fuzzy search
+if [[ -f "$HOME/.config/zsh/plugins/zsh-history-fuzzy-search.zsh" ]]; then
+  source "$HOME/.config/zsh/plugins/zsh-history-fuzzy-search.zsh"
+fi
+
 # Autosuggestions
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
