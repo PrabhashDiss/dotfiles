@@ -322,7 +322,7 @@ install_zoxide() {
 
 # Install zsh
 install_zsh() {
-    log_info "Installing zsh, lf, and zsh-syntax-highlighting..."
+    log_info "Installing zsh, lf, zsh-autosuggestions, and zsh-syntax-highlighting..."
 
     # Verify git is available
     if ! command_exists git; then
