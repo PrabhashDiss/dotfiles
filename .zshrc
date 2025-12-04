@@ -208,6 +208,13 @@ ex() {
 }
 extract() { ex "$@"; }
 
+# Autosuggestions
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+if [[ -f ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  source ~/.zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
 # Syntax highlighting
 if [[ -f ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
   source ~/.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
