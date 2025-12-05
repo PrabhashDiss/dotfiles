@@ -17,8 +17,10 @@ newnote () {
 
 selected () {
   choice=$(
-    echo -e "New\n$(find "${folder}" -type f -printf '%T@ %P\n' | sort -nr | cut -d' ' -f2-)" |
-    dmenu -c -l 5 -i -p "Choose note or create new: "
+    {
+      printf '%s\n' "New"
+      find "${folder}" -type f -printf '%T@ %P\n' | sort -nr | cut -d' ' -f2-
+    } | dmenu -c -l 5 -i -p "Choose note or create new: "
   )
   case $choice in
     New) newnote ;;
