@@ -8,8 +8,12 @@ if [ ! -d "$SCRIPT_DIR" ]; then
     exit 1
 fi
 
-# List files, show in dmenu, and execute
-SCRIPT=$(ls "$SCRIPT_DIR" | dmenu -c -l 10 -i -p "Run script: ")
+# List executable scripts, show in dmenu, and execute
+SCRIPT=$(
+  find "$SCRIPT_DIR" -maxdepth 1 -type f -executable -printf '%f\n' |
+  sort |
+  dmenu -c -l 10 -i -p "Run script: "
+)
 
 if [ -n "$SCRIPT" ]; then
     EXEC_PATH="$SCRIPT_DIR/$SCRIPT"
