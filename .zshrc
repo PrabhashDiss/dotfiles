@@ -123,12 +123,12 @@ ex() {
       [ -d "$dir_name" ] || mkdir -p "$dir_name"
 
       # Use absolute path for some commands that read from stdin
-      if ! path="$(realpath "$n" 2>/dev/null)"; then
+      if ! archive_path="$(realpath "$n" 2>/dev/null)"; then
         # Fallback if realpath is not available
         if [[ "$n" = /* ]]; then
-          path="$n"
+          archive_path="$n"
         else
-          path="$PWD/$n"
+          archive_path="$PWD/$n"
         fi
       fi
 
@@ -176,7 +176,7 @@ ex() {
           ;;
         *.cpio)
           # Use realpath so cpio can read the file when changing directory
-          (cd "$dir_name" && cpio -id < "$path")
+          (cd "$dir_name" && cpio -id < "$archive_path")
           extraction_status=$?
           ;;
         *.cba|*.ace)
