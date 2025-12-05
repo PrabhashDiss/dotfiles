@@ -7,8 +7,9 @@ folder="$HOME/notes"
 mkdir -p "$folder"
 
 newnote () {
-  dir="$(command ls -d \"$folder\" \"$folder\"*/ | dmenu -c -l 5 -i -p 'Choose directory: ')" || exit 0
+  dir="$(command ls -d "$folder" "$folder"*/ 2>/dev/null | dmenu -c -l 5 -i -p 'Choose directory: ')" || exit 0
   : "${dir:=$folder}"
+  dir="${dir%/}"  # Remove trailing slash if present
   name="$(echo "" | dmenu -c -sb "#a3be8c" -nf "#d8dee9" -p "Enter a name: " )" || exit 0
   : "${name:=$(date +%F_%H-%M-%S)}"
   setsid -f "${TERMINAL}" -e nvim "${dir}/${name}.md" > /dev/null 2>&1
