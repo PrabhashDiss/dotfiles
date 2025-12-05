@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$HOME/bin/dmenu_scripts"
+
+# Check if directory exists
+if [ ! -d "$SCRIPT_DIR" ]; then
+    notify-send "Error" "Script directory not found: $SCRIPT_DIR"
+    exit 1
+fi
+
+# List files, show in dmenu, and execute
+SCRIPT=$(ls "$SCRIPT_DIR" | dmenu -c -l 10 -i -p "Run script: ")
+
+if [ -n "$SCRIPT" ]; then
+    EXEC_PATH="$SCRIPT_DIR/$SCRIPT"
+    if [ -x "$EXEC_PATH" ]; then
+        "$EXEC_PATH"
+    else
+        notify-send "Error" "File is not executable: $SCRIPT"
+    fi
+fi
