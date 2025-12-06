@@ -5,6 +5,8 @@ setopt interactive_comments
 
 # vi mode
 bindkey -v
+bindkey -v '^?' backward-delete-char
+bindkey -v '^H' backward-delete-char
 KEYTIMEOUT=20
 
 # Use lf to switch directories and bind it to ctrl-o
