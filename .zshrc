@@ -3,6 +3,10 @@ setopt histignorealldups sharehistory
 setopt autocd
 setopt interactive_comments
 
+if [[ -f "${HOME}/shell/aliases.sh" ]]; then
+  source "${HOME}/shell/aliases.sh"
+fi
+
 # vi mode
 bindkey -v
 KEYTIMEOUT=20
