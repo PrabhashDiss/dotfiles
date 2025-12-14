@@ -15,6 +15,7 @@ fi
 # Cleanup helper for temporary files used by select_scan_ssid/connect
 cleanup_tmpf() {
     [ -n "$tmpf" ] && [ -f "$tmpf" ] && rm -f "$tmpf"
+    [ -n "$passfile" ] && [ -f "$passfile" ] && rm -f "$passfile"
 }
 trap cleanup_tmpf EXIT INT TERM
 
@@ -76,7 +77,20 @@ connect() {
             notify "No password provided, aborting"
             return
         fi
-        if ! "$NMCLI" device wifi connect "$ssid" password "$pass"; then
+
+        passfile=$(mktemp) || {
+            notify "Failed to create temp file"
+            return
+        }
+        chmod 600 "$passfile"
+        printf '%s' "802-11-wireless-security.psk:$pass" >"$passfile"
+        if "$NMCLI" device wifi connect "$ssid" passwd-file "$passfile"; then
+            rm -f "$passfile"
+            passfile=
+            notify "Connected to $ssid"
+        else
+            rm -f "$passfile"
+            passfile=
             notify "Failed to connect to $ssid"
             return
         fi
