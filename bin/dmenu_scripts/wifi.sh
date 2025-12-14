@@ -12,6 +12,12 @@ if [ -z "$NMCLI" ]; then
     exit 1
 fi
 
+# Cleanup helper for temporary files used by select_scan_ssid/connect
+cleanup_tmpf() {
+    [ -n "$tmpf" ] && [ -f "$tmpf" ] && rm -f "$tmpf"
+}
+trap cleanup_tmpf EXIT INT TERM
+
 dmenu_with_opts() {
     "$DMENU" -c -i "$@"
 }
@@ -46,12 +52,14 @@ select_scan_ssid() {
     display=$(cut -f1 "$tmpf" | dmenu_with_list_opts -p "Connect to network:") || display=""
     if [ -z "$display" ]; then
         rm -f "$tmpf"
+        tmpf=
         return
     fi
 
     # Map the selected formatted display back to its SSID
     ssid=$(awk -F"\t" -v sel="$display" '$1==sel{print $2; exit}' "$tmpf")
     rm -f "$tmpf"
+    tmpf=
     printf '%s' "$ssid"
 }
 
