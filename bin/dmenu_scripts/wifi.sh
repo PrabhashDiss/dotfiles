@@ -69,15 +69,13 @@ connect() {
             return
         fi
         if ! "$NMCLI" device wifi connect "$ssid" password "$pass"; then
-            if ! "$NMCLI" connection up "$ssid"; then
-                notify "Failed to connect to $ssid"
-            fi
+            notify "Failed to connect to $ssid"
+            return
         fi
     else
         if ! "$NMCLI" device wifi connect "$ssid"; then
-            if ! "$NMCLI" connection up "$ssid"; then
-                notify "Failed to connect to $ssid"
-            fi
+            notify "Failed to connect to $ssid"
+            return
         fi
     fi
 }
