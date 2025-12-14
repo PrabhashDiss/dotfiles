@@ -95,7 +95,9 @@ connect() {
             return
         fi
     else
-        if ! "$NMCLI" device wifi connect "$ssid"; then
+        if "$NMCLI" device wifi connect "$ssid"; then
+            notify "Connected to $ssid"
+        else
             notify "Failed to connect to $ssid"
             return
         fi
