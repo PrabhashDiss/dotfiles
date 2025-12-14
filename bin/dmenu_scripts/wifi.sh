@@ -49,7 +49,7 @@ select_scan_ssid() {
         return
     fi
 
-    # Mapp the selected formatted display back to its SSID
+    # Map the selected formatted display back to its SSID
     ssid=$(awk -F"\t" -v sel="$display" '$1==sel{print $2; exit}' "$tmpf")
     rm -f "$tmpf"
     printf '%s' "$ssid"
