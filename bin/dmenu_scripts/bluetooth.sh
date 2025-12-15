@@ -113,7 +113,11 @@ pair_device() {
     if [ -z "$mac" ]; then
         return
     fi
-    $BTCTL pair "$mac" >/dev/null 2>&1 && $BTCTL trust "$mac" >/dev/null 2>&1 && $BTCTL connect "$mac" >/dev/null 2>&1 && _notify "Pairing initiated: $mac" || _notify "Pairing failed: $mac"
+    if $BTCTL pair "$mac" >/dev/null 2>&1 && $BTCTL trust "$mac" >/dev/null 2>&1 && $BTCTL connect "$mac" >/dev/null 2>&1; then
+        _notify "Pairing initiated: $mac"
+    else
+        _notify "Pairing failed: $mac"
+    fi
 }
 
 remove_device() {
