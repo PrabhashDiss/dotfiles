@@ -17,7 +17,8 @@ cleanup_tmpf() {
     [ -n "$tmpf" ] && [ -f "$tmpf" ] && rm -f "$tmpf"
     [ -n "$passfile" ] && [ -f "$passfile" ] && rm -f "$passfile"
 }
-trap cleanup_tmpf EXIT INT TERM
+trap cleanup_tmpf EXIT
+trap 'cleanup_tmpf; exit 130' INT TERM
 
 dmenu_with_opts() {
     "$DMENU" -c -i "$@"
