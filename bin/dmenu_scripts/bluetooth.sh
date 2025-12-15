@@ -47,7 +47,7 @@ list_devices_menu() {
 
     # Produce lines: Alias<TAB>MAC<TAB>[Paired][Connected]\n
     $BTCTL devices 2>/dev/null | awk '{ $1=""; mac=$2; $2=""; sub(/^ /,""); alias=$0; print mac "\t" alias }' |
-        while IFS=$'\t' read -r mac alias; do
+        while IFS="$(printf '\t')" read -r mac alias; do
             [ -z "$mac" ] && continue
             info=$($BTCTL info "$mac" 2>/dev/null || true)
             if printf '%s' "$info" | grep -q 'Paired: yes'; then
