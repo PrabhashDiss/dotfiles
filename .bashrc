@@ -158,3 +158,9 @@ cap() {
 
 # Alias to search the last captured output
 alias slo=search_last_output
+
+# Bind Ctrl+G to launch lazygit and Ctrl+J to launch lazyjj
+if [[ $- == *i* ]]; then
+    bind -x '"\C-g":"lazygit"'
+    bind -x '"\C-j":"lazyjj"'
+fi
