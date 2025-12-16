@@ -143,6 +143,17 @@ ex() {
                 ;;
             esac
 
+            # Sanitize directory name to prevent path traversal
+            case "$dir_name" in
+                */* | *.* | *..*)
+                    echo "ex: '$n' - unsafe directory name '$dir_name'"
+                    failed=1
+                    continue
+                    ;;
+            esac
+
+            [ -d "$dir_name" ] || mkdir -p "$dir_name"
+
             [ -d "$dir_name" ] || mkdir -p "$dir_name"
 
             # Use absolute path for some commands that read from stdin
