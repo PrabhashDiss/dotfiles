@@ -147,7 +147,10 @@ cap() {
     mkdir -p "$OUTPUT_DIR"
 
     # Run the command with script to preserve colors
-    script -q -c "bash -ic \"$*\"" -f "$LAST_OUTPUT_FILE" 2>/dev/null
+    if ! script -q -c "$*" -f "$LAST_OUTPUT_FILE"; then
+        echo "Failed to capture output" >&2
+        return 1
+    fi
 
     # Clean up script artifacts
     sed -i 's/\r$//' "$LAST_OUTPUT_FILE" 2>/dev/null || true
