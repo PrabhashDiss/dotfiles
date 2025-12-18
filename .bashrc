@@ -283,3 +283,6 @@ alias slo=search_last_output
 # Bind Ctrl+X Ctrl+G to launch lazygit and Ctrl+X Ctrl+J to launch lazyjj
 bind -x '"\C-x\C-g":"lazygit"'
 bind -x '"\C-x\C-j":"lazyjj"'
+
+# Bind Ctrl+X Ctrl+P to open pulsemixer
+bind -x '"\C-x\C-p":"pulsemixer"'
