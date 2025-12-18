@@ -229,6 +229,27 @@ install_neovim() {
     fi
 }
 
+# Install pulsemixer
+install_pulsemixer() {
+    log_info "Installing pulsemixer to $HOME/.local/bin..."
+    mkdir -p "$HOME/.local/bin"
+    local target="$HOME/.local/bin/pulsemixer"
+
+    if [ -x "$target" ]; then
+        log_info "pulsemixer already present at $target"
+        return 0
+    fi
+
+    if curl -fsSL https://raw.githubusercontent.com/GeorgeFilipkin/pulsemixer/master/pulsemixer -o "$target"; then
+        chmod +x "$target"
+        log_success "pulsemixer installed to $target"
+    else
+        log_error "Failed to download pulsemixer"
+        rm -f "$target" 2>/dev/null || true
+        return 1
+    fi
+}
+
 # Install fish shell
 install_fish() {
     log_info "Checking fish installation..."
@@ -592,7 +613,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd tmux grc neovim fish zoxide zsh shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd tmux grc neovim pulsemixer fish zoxide zsh shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -666,6 +687,12 @@ main() {
         install_neovim
     else
         log_info "Skipping neovim"
+    fi
+
+    if is_selected pulsemixer; then
+        install_pulsemixer
+    else
+        log_info "Skipping pulsemixer"
     fi
 
     if is_selected fish; then
