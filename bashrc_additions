@@ -56,6 +56,8 @@ alias ports='netstat -tulanp'
 
 # fzf key bindings and fuzzy completion
 if command -v fzf >/dev/null 2>&1; then
+    # Enable fzf bash completion
+    eval "$(fzf --bash)"
     # Source fzf key bindings (compatible with older versions)
     if [[ -f "/usr/share/doc/fzf/examples/key-bindings.bash" ]]; then
         source "/usr/share/doc/fzf/examples/key-bindings.bash"
