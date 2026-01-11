@@ -283,3 +283,8 @@ alias slo=search_last_output
 # Bind Ctrl+X Ctrl+G to launch lazygit and Ctrl+X Ctrl+J to launch lazyjj
 bind -x '"\C-x\C-g":"lazygit"'
 bind -x '"\C-x\C-j":"lazyjj"'
+
+# Add ~/.local/bin to PATH
+export PATH="$HOME/.local/bin:$PATH"
+# Bind Ctrl+X Ctrl+P to open pulsemixer
+bind -x '"\C-x\C-p":"pulsemixer"'
