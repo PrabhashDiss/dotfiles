@@ -289,5 +289,9 @@ bind -x '"\C-x\C-j":"lazyjj"'
 
 # Add ~/.local/bin to PATH
 export PATH="$HOME/.local/bin:$PATH"
+# Bind Ctrl+X Ctrl+B to open bluetui
+bind -x '"\C-x\C-b":"bluetui"'
+# Bind Ctrl+X Ctrl+N to open nmtui
+bind -x '"\C-x\C-n":"nmtui"'
 # Bind Ctrl+X Ctrl+P to open pulsemixer
 bind -x '"\C-x\C-p":"pulsemixer"'
