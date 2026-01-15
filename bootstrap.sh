@@ -170,6 +170,33 @@ install_grc() {
     fi
 }
 
+# Install bluetui
+install_bluetui() {
+    log_info "Checking bluetui installation..."
+
+    if command_exists bluetui; then
+        log_success "bluetui is already installed"
+        return 0
+    fi
+
+    log_info "Attempting to install bluetui via cargo..."
+
+    if ! command_exists cargo; then
+        log_warning "cargo (Rust) not found. Install Rust/Cargo (https://rustup.rs) and re-run the script, or install bluetui manually."
+        return 1
+    fi
+
+    if cargo install bluetui 2>/dev/null; then
+        if command_exists bluetui; then
+            log_success "bluetui installed via cargo"
+            return 0
+        fi
+    fi
+
+    log_warning "Could not install bluetui automatically via cargo. Try 'cargo install bluetui' manually."
+    return 1
+}
+
 # Install neovim
 install_neovim() {
     log_info "Checking neovim installation..."
@@ -696,7 +723,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd shotgun_and_hacksaw tmux grc neovim pulsemixer fish zoxide zsh sxhkd sx shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd shotgun_and_hacksaw tmux grc bluetui neovim pulsemixer fish zoxide zsh sxhkd sx shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -730,7 +757,7 @@ main() {
     }
 
     # Update package list if any package install is requested
-    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected fish || is_selected zoxide; then
+    if is_selected fzf || is_selected bat || is_selected lsd || is_selected tmux || is_selected grc || is_selected bluetui || is_selected fish || is_selected zoxide; then
         update_package_list
     fi
 
@@ -770,6 +797,12 @@ main() {
         install_grc
     else
         log_info "Skipping grc"
+    fi
+
+    if is_selected bluetui; then
+        install_bluetui
+    else
+        log_info "Skipping bluetui"
     fi
 
     if is_selected neovim; then
