@@ -8,8 +8,8 @@
 . /etc/X11/Xsession
 
 # Start sxhkd if available
-if [ -x /usr/bin/sxhkd ]; then
-	/usr/bin/sxhkd &
+if command -v sxhkd >/dev/null 2>&1; then
+	sxhkd &
 fi
 
 # Start dwm as the window manager for this X session
