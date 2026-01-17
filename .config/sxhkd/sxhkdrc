@@ -1,0 +1,8 @@
+super + s
+    $HOME/bin/screenshot.sh
+
+super + shift + s
+    $HOME/bin/screenshot.sh selection
+
+super + w
+    $HOME/bin/screenshot.sh window

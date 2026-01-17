@@ -439,6 +439,23 @@ install_zsh() {
     fi
 }
 
+install_sxhkd() {
+    log_info "Checking sxhkd installation..."
+
+    if command_exists sxhkd; then
+        log_success "sxhkd is already installed"
+        return 0
+    fi
+
+    log_info "Installing sxhkd via apt..."
+    if sudo apt install -y sxhkd; then
+        log_success "sxhkd installed via apt"
+    else
+        log_error "sxhkd installation via apt failed"
+        return 1
+    fi
+}
+
 # Install bat for better file previews
 install_bat() {
     log_info "Checking bat installation..."
@@ -613,7 +630,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd tmux grc neovim pulsemixer fish zoxide zsh shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd tmux grc neovim pulsemixer fish zoxide zsh sxhkd shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -711,6 +728,12 @@ main() {
         install_zsh
     else
         log_info "Skipping zsh"
+    fi
+
+    if is_selected sxhkd; then
+        install_sxhkd
+    else
+        log_info "Skipping sxhkd"
     fi
 
     # Setup configurations
