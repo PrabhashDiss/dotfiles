@@ -619,6 +619,43 @@ setup_fzf() {
     fi
 }
 
+install_shotgun_and_hacksaw() {
+    log_info "Installing shotgun and hacksaw via cargo..."
+
+    if ! command_exists cargo; then
+        log_error "cargo not found. Install Rust first."
+        return 1
+    fi
+
+    # Install shotgun
+    if command_exists shotgun; then
+        log_success "shotgun already installed"
+    else
+        log_info "Installing shotgun from neXromancers/shotgun..."
+        if cargo install --git https://github.com/neXromancers/shotgun --bin shotgun --force; then
+            log_success "shotgun installed via cargo"
+        else
+            log_error "Failed to install shotgun via cargo"
+            return 1
+        fi
+    fi
+
+    # Install hacksaw
+    if command_exists hacksaw; then
+        log_success "hacksaw already installed"
+    else
+        log_info "Installing hacksaw from neXromancers/hacksaw..."
+        if cargo install --git https://github.com/neXromancers/hacksaw --bin hacksaw --force; then
+            log_success "hacksaw installed via cargo"
+        else
+            log_error "Failed to install hacksaw via cargo"
+            return 1
+        fi
+    fi
+
+    return 0
+}
+
 # Main function
 main() {
     log_info "Starting dotfiles bootstrap..."
@@ -630,7 +667,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd tmux grc neovim pulsemixer fish zoxide zsh sxhkd shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd shotgun_and_hacksaw tmux grc neovim pulsemixer fish zoxide zsh sxhkd shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -685,6 +722,12 @@ main() {
         install_lsd
     else
         log_info "Skipping lsd"
+    fi
+
+    if is_selected shotgun_and_hacksaw; then
+        install_shotgun_and_hacksaw
+    else
+        log_info "Skipping shotgun and hacksaw install"
     fi
 
     if is_selected tmux; then
