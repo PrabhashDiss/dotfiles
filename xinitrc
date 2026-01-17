@@ -7,5 +7,10 @@
 # invoke global X session script
 . /etc/X11/Xsession
 
+# Start sxhkd if available
+if [ -x /usr/bin/sxhkd ]; then
+	/usr/bin/sxhkd &
+fi
+
 # Start dwm as the window manager for this X session
 exec dwm
