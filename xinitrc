@@ -6,3 +6,6 @@
 
 # invoke global X session script
 . /etc/X11/Xsession
+
+# Start dwm as the window manager for this X session
+exec dwm
