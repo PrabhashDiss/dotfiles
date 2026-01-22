@@ -7,6 +7,8 @@
 # invoke global X session script
 # . /etc/X11/Xsession
 
+setxkbmap -option caps:escape
+
 # Start sxhkd if available
 if command -v sxhkd >/dev/null 2>&1; then
 	sxhkd &
