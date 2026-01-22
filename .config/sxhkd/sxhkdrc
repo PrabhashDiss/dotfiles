@@ -6,3 +6,6 @@ super + shift + s
 
 super + w
     $HOME/bin/screenshot.sh window
+
+super + x
+    whisper
