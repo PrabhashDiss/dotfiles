@@ -456,6 +456,35 @@ install_sxhkd() {
     fi
 }
 
+install_sx() {
+    log_info "Checking sx installation..."
+
+    if command_exists sx; then
+        log_success "sx is already installed"
+        return 0
+    fi
+
+    log_info "Cloning sx and running make install"
+    local tmpdir
+    tmpdir=$(mktemp -d)
+    if git clone https://github.com/Earnestly/sx "$tmpdir/sx"; then
+        if (cd "$tmpdir/sx" && sudo make install); then
+            log_success "sx installed from source"
+        else
+            log_error "Failed to build/install sx from source"
+            rm -rf "$tmpdir"
+            return 1
+        fi
+    else
+        log_error "Failed to clone sx repository"
+        rm -rf "$tmpdir"
+        return 1
+    fi
+    rm -rf "$tmpdir"
+
+    return 0
+}
+
 # Install bat for better file previews
 install_bat() {
     log_info "Checking bat installation..."
@@ -667,7 +696,7 @@ main() {
     fi
 
     # Selection: allow user to pick which components to install
-    local all_components=(fzf bat lsd shotgun_and_hacksaw tmux grc neovim pulsemixer fish zoxide zsh sxhkd shell tmuxconf fzfinit)
+    local all_components=(fzf bat lsd shotgun_and_hacksaw tmux grc neovim pulsemixer fish zoxide zsh sxhkd sx shell tmuxconf fzfinit)
 
     # Default selection behavior: if not running in a TTY, assume all
     local selection=""
@@ -777,6 +806,12 @@ main() {
         install_sxhkd
     else
         log_info "Skipping sxhkd"
+    fi
+
+    if is_selected sx; then
+        install_sx
+    else
+        log_info "Skipping sx"
     fi
 
     # Setup configurations

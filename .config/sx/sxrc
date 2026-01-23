@@ -1,0 +1,11 @@
+#!/bin/sh
+
+setxkbmap -option caps:escape &
+
+# Start sxhkd if available
+if command -v sxhkd >/dev/null 2>&1; then
+	sxhkd &
+fi
+
+# Start dwm as the window manager for this X session
+exec dwm
