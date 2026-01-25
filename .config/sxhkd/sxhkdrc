@@ -1,3 +1,9 @@
+super + v
+    $HOME/bin/dmenu_scripts/txtcliphist sel
+
+super + c
+    $HOME/bin/dmenu_scripts/txtcliphist add
+
 super + s
     $HOME/bin/screenshot.sh
 
