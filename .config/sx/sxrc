@@ -8,4 +8,5 @@ if command -v sxhkd >/dev/null 2>&1; then
 fi
 
 # Start dwm as the window manager for this X session
+command -v slstatus >/dev/null 2>&1 && slstatus &
 exec dwm
