@@ -186,7 +186,7 @@ install_bluetui() {
         return 1
     fi
 
-    if cargo install bluetui 2>/dev/null; then
+    if cargo install bluetui; then
         if command_exists bluetui; then
             log_success "bluetui installed via cargo"
             return 0
