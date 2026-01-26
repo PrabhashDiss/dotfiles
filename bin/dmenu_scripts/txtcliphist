@@ -17,14 +17,14 @@ write() {
     notify-send "Creating $histfile"
   fi
   [ -z "$clip" ] && exit 0
-  multiline=$(echo "$clip" | sed ':a;N;$!ba;s/\n/'"$placeholder"'/g')
-  grep -Fxq "$multiline" "$histfile" || echo "$multiline" >> "$histfile"
-  notification=$(echo \"$multiline\") ;}
+  multiline=$(printf '%s' "$clip" | sed ':a;N;$!ba;s/\n/'"$placeholder"'/g')
+  grep -Fxq "$multiline" "$histfile" || printf '%s\n' "$multiline" >> "$histfile"
+  notification="$multiline" ;}
 
 sel() {
   [ -f "$histfile" ] || touch "$histfile"
   selection=$(tac "$histfile" | dmenu -b -l 5 -i -p "Clipboard history:")
-  [ -n "$selection" ] && echo "$selection" | sed "s/$placeholder/\n/g" | xclip -i -selection clipboard && notification="Copied to clipboard!" ;}
+  [ -n "$selection" ] && printf '%s\n' "$selection" | sed "s/$placeholder/\n/g" | xclip -i -selection clipboard && notification="Copied to clipboard!" ;}
 case "$1" in
   add) highlight && write ;;
   out) output && write ;;
