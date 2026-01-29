@@ -22,3 +22,5 @@ if [ -d "$HOME/bin" ]; then
 fi
 
 export NVM_DIR="$HOME/.config/nvm"
+
+. "$HOME/.cargo/env"
