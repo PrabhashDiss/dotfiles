@@ -108,6 +108,10 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
+if [ -f "$HOME/.config/bash/exports" ]; then
+    . "$HOME/.config/bash/exports"
+fi
+
 if [ -f "$HOME/.config/bash/functions" ]; then
     . "$HOME/.config/bash/functions"
 fi
