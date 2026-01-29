@@ -311,3 +311,6 @@ bind -x '"\C-x\C-b":"bluetui"'
 bind -x '"\C-x\C-n":"nmtui"'
 # Bind Ctrl+X Ctrl+P to open pulsemixer
 bind -x '"\C-x\C-p":"pulsemixer"'
+
+eval "$(zoxide init bash)"
+alias cd='z'
