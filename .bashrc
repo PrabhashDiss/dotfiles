@@ -112,6 +112,10 @@ if [ -f "$HOME/.config/bash/functions" ]; then
     . "$HOME/.config/bash/functions"
 fi
 
+if [ -f "$HOME/.config/bash/path" ]; then
+    . "$HOME/.config/bash/path"
+fi
+
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
