@@ -24,3 +24,5 @@ fi
 export NVM_DIR="$HOME/.config/nvm"
 
 . "$HOME/.cargo/env"
+
+. "$HOME/.local/share/../bin/env"
