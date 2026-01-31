@@ -108,6 +108,14 @@ if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
+if [ -f "$HOME/.config/bash/completions" ]; then
+    . "$HOME/.config/bash/completions"
+fi
+
+if [ -f "$HOME/.config/bash/exports" ]; then
+    . "$HOME/.config/bash/exports"
+fi
+
 if [ -f "$HOME/.config/bash/functions" ]; then
     . "$HOME/.config/bash/functions"
 fi
@@ -303,3 +311,6 @@ bind -x '"\C-x\C-b":"bluetui"'
 bind -x '"\C-x\C-n":"nmtui"'
 # Bind Ctrl+X Ctrl+P to open pulsemixer
 bind -x '"\C-x\C-p":"pulsemixer"'
+
+eval "$(zoxide init bash)"
+alias cd='z'

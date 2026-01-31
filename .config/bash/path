@@ -12,4 +12,9 @@ esac
 
 . "$HOME/.local/share/../bin/env"
 
+case ":$PATH:" in
+  *":$HOME/.opencode/bin:") ;; 
+  *) PATH="$HOME/.opencode/bin:$PATH" ;;
+esac
+
 export PATH
